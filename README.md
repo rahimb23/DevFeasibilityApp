@@ -11,7 +11,9 @@ A map of City of Toronto development applications with a site feasibility tool.
   - a residual land value pro forma, with assumptions you can edit and a price/cost sensitivity grid
 
 - **Opportunities:** every parcel gets a development opportunity score out of 100. It adds points for zoning (up to 25), transit station area (20), room to add density compared with nearby approvals (25), lot size (15), recent applications nearby (10) and a Secondary Plan (5), and takes points off for TRCA, ravine, natural heritage and heritage constraints.
-  - Left out entirely: condos, designated heritage, floodplain land, parks, employment and institutional zones, small lots, and sites with a recent application.
+  - Left out entirely: condos, designated heritage, floodplain land, parks, employment and institutional zones, and small lots.
+  - Development applications located on a site are flagged in the list, on the map (blue ring) and in the site panel, which lists every file on the site with links.
+  - Sites with a rezoning, site plan, condo or subdivision file from the last 6 years are marked as already in the pipeline. They are hidden unless you include them, and shown with a dashed ring.
   - Shown as a ranked list (filter by score, lot size and map view), a heat-coloured map layer, and a per-site breakdown in the site panel.
   - Built by `scripts/build_opportunities.py`.
 - **Feasibility report:** *Create feasibility report* in the site panel builds a printable report (Print or save as PDF) for the selected site:

@@ -6,8 +6,10 @@ the best-scoring parcels for the map and the Opportunities tab.
 Score (0-100) = zoning (25) + transit (20) + density gap (25) + lot size (15)
               + market momentum (10) + Secondary Plan (5) - constraint penalties.
 Parcels are excluded (opp = -code) when they are condos, designated heritage, in the
-floodplain, in a zone not meant for intensification, too small, have little room to add
-floor area, or already have a rezoning or site plan file from the last 6 years.
+floodplain, in a zone not meant for intensification, too small, or have little room to add
+floor area. Development applications located on each parcel are counted; parcels with a
+rezoning, site plan, condo or subdivision file from the last 6 years are flagged as already
+in the pipeline.
 
 Usage: python3 build_opportunities.py <site-dir>
 """
@@ -36,8 +38,8 @@ EX = {'condo': 1, 'designated': 2, 'floodplain': 3, 'zone': 4, 'small': 5, 'noga
 # ---- Application-derived neighbourhood stats on a ~550 m grid ----
 CELL = 0.005
 def cell(lat, lon): return (math.floor(lon / CELL), math.floor(lat / CELL))
-fsi_cells, count_cells, app_pts = {}, {}, []
-for r in apps_doc['rows']:
+fsi_cells, count_cells, app_pts, app_idx = {}, {}, [], []
+for ai, r in enumerate(apps_doc['rows']):
     pts, typ, sub = r[A['pts']], r[A['type']], r[A['submitted']] or ''
     if not pts: continue
     lat, lon = pts[0]
@@ -45,8 +47,9 @@ for r in apps_doc['rows']:
         k = cell(lat, lon); count_cells[k] = count_cells.get(k, 0) + 1
     if typ in ('OZ', 'SA') and sub >= since10 and r[A['fsi']] and 'refused' not in (r[A['status']] or '').lower():
         k = cell(lat, lon); fsi_cells.setdefault(k, []).append(r[A['fsi']])
-    if typ in ('OZ', 'SA') and sub >= since6:
-        for la, lo in pts: app_pts.append((lo, la))
+    for la, lo in pts:  # every application, any type or year, for the on-site check
+        app_pts.append((lo, la)); app_idx.append(ai)
+
 
 def around(d, k, empty):
     out = [] if empty == 'list' else 0
@@ -65,7 +68,7 @@ for path in sorted(glob.glob(f'{site}/parcels/*.json')):
 rows = [(p, i, r) for p, t in tiles.items() for i, r in enumerate(t['rows'])]
 print(len(rows), 'parcels', flush=True)
 
-# parcels that already have a recent rezoning / site plan file on them
+# development applications located on each parcel (any type, any year)
 polys = []
 for p, i, r in rows:
     ring, q = r[C['ring']], tiles[p]['q']
@@ -73,11 +76,19 @@ for p, i, r in rows:
     polys.append(shapely.Polygon(xy) if len(xy) >= 3 else shapely.Point(0, 0))
 polys = np.asarray(polys, dtype=object)
 tree = shapely.STRtree(polys)
-inplay = np.zeros(len(rows), dtype=bool)
+on_site = {}
 if app_pts:
     a, b = tree.query(shapely.points(np.asarray(app_pts)), predicate='within')
-    inplay[b] = True
-print(int(inplay.sum()), 'parcels already in the pipeline', flush=True)
+    for ai, pi in zip(a, b):
+        lst = on_site.setdefault(int(pi), [])
+        if app_idx[ai] not in lst: lst.append(app_idx[ai])
+def latest_first(ids):
+    return sorted(ids, key=lambda j: apps_doc['rows'][j][A['submitted']] or '', reverse=True)
+# "in the pipeline": a rezoning, site plan, condominium or subdivision file from the last 6 years on the parcel
+inplay = np.zeros(len(rows), dtype=bool)
+for pi, ids in on_site.items():
+    inplay[pi] = any(apps_doc['rows'][j][A['type']] in ('OZ', 'SA', 'CD', 'SB') and (apps_doc['rows'][j][A['submitted']] or '') >= since6 for j in ids)
+print(len(on_site), 'parcels have applications on them;', int(inplay.sum()), 'already in the pipeline', flush=True)
 
 # ---- Score ----
 opps = []
@@ -91,7 +102,6 @@ for n, (p, i, r) in enumerate(rows):
     if env & 1: r.append(-EX['floodplain']); continue
     if zcat in EXCLUDE_ZONES or (z and zcat not in ZONE_PTS): r.append(-EX['zone']); continue
     if area < 300: r.append(-EX['small']); continue
-    if inplay[n]: r.append(-EX['inplay']); continue
 
     lat, lon = r[C['lat']], r[C['lon']]
     k = cell(lat, lon)
@@ -119,30 +129,38 @@ for n, (p, i, r) in enumerate(rows):
     penalty = (15 if env & 2 else 0) + (15 if env & 4 else 0) + (10 if env & 8 else 0) + (10 if r[C['ravine']] else 0) \
         + (12 if her == 'Part V' else 8 if her == 'Listed' else 0)
     score = max(0, min(100, zone_pts + transit + gap + size + momentum + plan - penalty))
-    r.append([score, zone_pts, transit, gap, size, momentum, plan, penalty, round(target, 1), round(add_gfa), cnt])
-    opps.append((score, add_gfa, p, r))
+    r.append([score, zone_pts, transit, gap, size, momentum, plan, penalty, round(target, 1), round(add_gfa), cnt,
+              len(on_site.get(n, [])), int(inplay[n])])
+    opps.append((score, add_gfa, p, r, n))
 
 # ---- Write tiles, index and the ranked list ----
 for path, t in tiles.items():
     with open(path, 'w') as fh:
         fh.write('{"q":%d,"rows":[\n' % t['q'] + ',\n'.join(json.dumps(r, separators=(',', ':')) for r in t['rows']) + '\n]}')
 idx['cols'].append('opp')
-idx['oppParts'] = ['score', 'zoning', 'transit', 'densityGap', 'lotSize', 'momentum', 'secondaryPlan', 'penalty', 'targetFsi', 'addGfaM2', 'nearbyFiles']
+idx['oppParts'] = ['score', 'zoning', 'transit', 'densityGap', 'lotSize', 'momentum', 'secondaryPlan', 'penalty', 'targetFsi', 'addGfaM2', 'nearbyFiles', 'appsOnSite', 'inPipeline']
 idx['oppExcluded'] = {str(v): k for k, v in EX.items()}
 json.dump(idx, open(f'{site}/parcel-index.json', 'w'), separators=(',', ':'))
 
 opps.sort(key=lambda x: (-x[0], -x[1]))
-top = []
-for score, add_gfa, p, r in opps:
-    if score < 50 and len(top) >= 1500: break
-    if len(top) >= 3000: break
+top, n_free, n_pipe = [], 0, 0
+for score, add_gfa, p, r, n in opps:
+    # up to 3,000 open sites plus up to 1,500 sites already in the pipeline (shown on request)
+    if inplay[n]:
+        if n_pipe >= 1500 or score < 50: continue
+        n_pipe += 1
+    else:
+        if n_free >= 3000 or (score < 50 and n_free >= 1500): continue
+        n_free += 1
     z = zones[r[C['zone']]] if r[C['zone']] >= 0 else None
     m = mtsa[r[C['mtsa']]] if r[C['mtsa']] >= 0 else None
     o = r[-1]
     top.append({'id': r[C['id']], 'lat': r[C['lat']], 'lon': r[C['lon']], 's': score, 'a': (r[C['addresses']] or [None])[0],
                 'area': r[C['areaM2']], 'z': z[ZC['string']] if z else None, 't': o[8], 'g': o[9], 'm': m[0] if m else None,
-                'parts': o[1:8]})
+                'parts': o[1:8], 'n': o[11], 'p': o[12],
+                'ap': [[apps_doc['rows'][j][A['id']], apps_doc['rows'][j][A['type']], apps_doc['rows'][j][A['status']], apps_doc['rows'][j][A['submitted']]]
+                       for j in latest_first(on_site.get(n, []))[:3]]})
 json.dump({'generated': today.isoformat(), 'count': len(opps), 'top': top}, open(f'{site}/opportunities.json', 'w'), separators=(',', ':'))
 scores = np.array([o[0] for o in opps])
 print(f'scored {len(opps)} parcels; median {np.median(scores):.0f}, 90th pct {np.percentile(scores, 90):.0f}, max {scores.max()}; '
-      f'{len(top)} in opportunities.json', flush=True)
+      f'{len(top)} in opportunities.json ({n_pipe} already in the pipeline)', flush=True)
