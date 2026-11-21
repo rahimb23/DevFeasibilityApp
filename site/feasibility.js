@@ -153,6 +153,18 @@ function drawSelection() {
   siteLayer = L.featureGroup(site.parcels.map((p) => L.polygon(p.pts, { color: css('--accent'), weight: 2.5, fillColor: css('--accent'), fillOpacity: 0.18, interactive: false }))).addTo(map);
 }
 
+// Former general zoning by-laws, by pre-1998 municipality. They still apply where
+// By-law 569-2013 does not (usually because of site-specific by-laws or appeals).
+const FORMER_BYLAWS = {
+  'TORONTO': { name: 'Former City of Toronto General Zoning By-law 438-86' },
+  'NORTH YORK': { name: 'Former City of North York Zoning By-law 7625' },
+  'ETOBICOKE': { name: 'Former City of Etobicoke Zoning Code' },
+  'YORK': { name: 'Former City of York Zoning By-law 1-83' },
+  'EAST YORK': { name: 'Former Borough of East York Zoning By-law 6752', note: 'In Leaside, the former Town of Leaside By-law 1916 applies instead.' },
+  'SCARBOROUGH': { name: 'A former City of Scarborough Community or Employment District zoning by-law', note: 'Scarborough had a separate by-law for each district. The City’s zoning map names the one for this site.' },
+};
+const ZONING_MAP = 'https://map.toronto.ca/gccmaps/?app=zoning';
+
 // ---------- Analysis ----------
 const LOOK = () => PARCELS.index;
 function zoneOf(p) {
@@ -166,10 +178,15 @@ function siteFacts() {
   let fsiArea = 0, fsiW = 0;
   const zones = new Map(), sps = new Set(), sasp = new Set(), mtsa = new Map(), heritage = new Set(), addrs = [];
   let heightM = null, heightSt = null, cov = null, ravine = false, unzoned = false, condo = false, holding = false;
+  const formerBylaws = new Set();
   let bFoot = 0, bGfa = 0, bMax = 0, bCount = 0;
   for (const p of P) {
     const z = zoneOf(p);
-    if (!z) unzoned = true; else {
+    if (!z) {
+      unzoned = true;
+      const fm = p.formerMun != null && p.formerMun >= 0 ? (LOOK().formerMunicipalities || [])[p.formerMun] : null;
+      formerBylaws.add(fm || '');
+    } else {
       zones.set(z.string, z);
       if (z.fsi) { fsiArea += p.areaM2; fsiW += z.fsi * p.areaM2; }
       if (z.holding) holding = true;
@@ -188,7 +205,7 @@ function siteFacts() {
   }
   let lat = 0, lon = 0; for (const p of P) { lat += p.lat; lon += p.lon; } lat /= P.length; lon /= P.length;
   return { area, zonedFsi: fsiArea ? fsiW / fsiArea : null, zonedFsiShare: area ? fsiArea / area : 0, zones: [...zones.values()], heightM, heightSt, cov,
-    sps: [...sps], sasp: [...sasp].sort(), mtsa: [...mtsa.values()], ravine, heritage: [...heritage], unzoned, condo, holding, addrs,
+    sps: [...sps], sasp: [...sasp].sort(), mtsa: [...mtsa.values()], ravine, heritage: [...heritage], unzoned, formerBylaws: [...formerBylaws], condo, holding, addrs,
     bFoot, bGfa, bMax, bCount, lat, lon, width: P.length === 1 ? P[0].widthM : null, depth: P.length === 1 ? P[0].depthM : null };
 }
 function precedents(f) {
@@ -288,8 +305,11 @@ function renderSite() {
   // Planning controls
   const zoneTxt = f.zones.length ? f.zones.map((z) => `<code>${esc(z.string)}</code>${z.exception ? ` <span class="fn-inline">exception ${esc(z.exception)}</span>` : ''}`).join('<br>') : '';
   $('sitePlanning').innerHTML = [
-    fact('Zoning (By-law 569-2013)', f.unzoned && !f.zones.length ? 'Not covered' : zoneTxt, f.unzoned ? 'Part or all of this site is still governed by a former municipal by-law. Check the City’s zoning map.' : ''),
-    fact('Zoned density', f.zonedFsi ? `FSI ${num(f.zonedFsi, 2)}` : '—', f.zonedFsi ? `${num(f.zonedFsi * f.area)} m² as of right` : 'No FSI in the zone label'),
+    fact('Zoning (By-law 569-2013)', f.unzoned && !f.zones.length ? 'Not covered' : zoneTxt, f.unzoned && f.zones.length ? 'Part of this site is not covered. See the former by-law below.' : ''),
+    f.unzoned ? fact('Former by-law in effect', f.formerBylaws.map((m) => esc(FORMER_BYLAWS[m]?.name || 'A former municipal zoning by-law')).join('<br>'),
+      [...new Set(f.formerBylaws.map((m) => FORMER_BYLAWS[m]?.note).filter(Boolean))].map(esc).join(' ') +
+      `${f.formerBylaws.some((m) => FORMER_BYLAWS[m]?.note) ? ' ' : ''}Applies as amended by any site-specific by-laws, which this data does not include, so zoned density and height are not shown. <a href="${ZONING_MAP}" target="_blank" rel="noopener">Check the City’s zoning map ↗</a>`) : '',
+    fact('Zoned density', f.zonedFsi ? `FSI ${num(f.zonedFsi, 2)}` : '—', f.zonedFsi ? `${num(f.zonedFsi * f.area)} m² as of right` : f.unzoned && !f.zones.length ? 'Set by the former by-law' : 'No FSI in the zone label'),
     fact('Height limit', f.heightM ? `${num(f.heightM, 1)} m` + (f.heightSt ? ` · ${f.heightSt} storeys` : '') : '—', 'Height overlay'),
     fact('Lot coverage', f.cov ? `${num(f.cov)}%` : '—'),
     fact('Secondary Plan', f.sps.length ? esc(f.sps.join(', ')) : 'None'),

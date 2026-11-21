@@ -45,5 +45,5 @@ Set `SKIP_FETCH=1` to rebuild from data already in `data/raw/`.
 
 - Residual land value is a screening estimate: (revenue − hard costs − contingency − soft costs − development charges − demolition − sales − financing − profit) ÷ (1 + land closing % + parkland % + CBC % + land carry). The default assumptions are placeholders, so replace them with current market and cost figures.
 - Units, storeys, GFA and FSI for applications are read from free-text descriptions, so treat them as estimates.
-- About 5% of parcels are outside Zoning By-law 569-2013, where a former municipal by-law applies. The panel flags these.
+- About 5% of parcels are outside Zoning By-law 569-2013. For these, the panel names the former general by-law from the parcel's pre-1998 municipality: Toronto 438-86, North York 7625, the Etobicoke Zoning Code, York 1-83, East York 6752 (Leaside 1916), or a Scarborough district by-law. It also links to the City's zoning map, since site-specific amendments aren't in the open data.
 - Address search works offline from the City's street centreline: addresses, intersections ("King & Spadina") and wards.

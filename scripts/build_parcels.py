@@ -1,7 +1,8 @@
 """Precompute parcel-level feasibility facts for the Development Radar.
 
 For every property parcel (City of Toronto Property Boundaries) this joins:
-  zoning (By-law 569-2013 zone string, FSI, coverage, holding, exception), height and
+  zoning (By-law 569-2013 zone string, FSI, coverage, holding, exception), the former
+  municipality (which sets the old by-law where 569-2013 does not apply), height and
   lot-coverage overlays, Secondary Plan, Site and Area Specific Policies, Major Transit
   Station Areas, ravine protection, the heritage register, 3D massing (existing
   buildings) and address points, then writes the parcels into map tiles.
@@ -144,6 +145,14 @@ mi = point_join(mg)
 rg, _ = load_shp(find_shp('ravine'))
 rv = intersect_join(rg)
 
+print('former municipalities…', flush=True)
+fm_names = []
+fmi = np.full(N, -1)
+if os.path.exists(f'{src}/formermun.geojson'):
+    fg, fp = load_geojson('formermun.geojson')
+    fmi = point_join(fg)
+    fm_names = [p['AREA_NAME'] for p in fp]
+
 print('heritage…', flush=True)
 hrg, hrp = load_shp(find_shp('heritage'))
 tree = shapely.STRtree(pg)
@@ -209,18 +218,18 @@ for i in range(N):
         h['HT_LABEL'] if h and (h['HT_LABEL'] or -1) > 0 else None, h['HT_STORIES'] if h and (h['HT_STORIES'] or -1) > 0 else None,
         cp[ci[i]]['PRCNT_CVER'] if ci[i] >= 0 else None, int(si[i]), sorted(set(int(k) for k in asj.get(i, []))), int(mi[i]),
         1 if i in rv else 0, heritage.get(i), round(float(bfp[i])), round(float(bmax[i]), 1), round(float(bgfa[i])), int(bcount[i]),
-        sorted(addrs.get(i, []), key=addr_sort)[:3], round(x, 6), round(y, 6), d,
+        sorted(addrs.get(i, []), key=addr_sort)[:3], int(fmi[i]), round(x, 6), round(y, 6), d,
     ]
     tiles[tk].append(row)
 
 cols = ['id', 'kind', 'areaM2', 'widthM', 'depthM', 'zone', 'heightM', 'heightStoreys', 'coveragePct', 'secondaryPlan', 'sasp', 'mtsa',
-        'ravine', 'heritage', 'bldgFootprintM2', 'bldgMaxHeightM', 'bldgGfaEstM2', 'bldgCount', 'addresses', 'lon', 'lat', 'ring']
+        'ravine', 'heritage', 'bldgFootprintM2', 'bldgMaxHeightM', 'bldgGfaEstM2', 'bldgCount', 'addresses', 'formerMun', 'lon', 'lat', 'ring']
 index = {}
 for (tx, ty), rows in tiles.items():
     name = f'{tx}_{ty}'
     with open(f'{out}/parcels/{name}.json', 'w') as fh:
         fh.write('{"q":%d,"rows":[\n' % QP + ',\n'.join(json.dumps(r, separators=(',', ':')) for r in rows) + '\n]}')
     index[name] = len(rows)
-lookups.update({'cols': cols, 'tile': TILE, 'tiles': index})
+lookups.update({'cols': cols, 'tile': TILE, 'tiles': index, 'formerMunicipalities': fm_names})
 json.dump(lookups, open(f'{out}/parcel-index.json', 'w'), separators=(',', ':'))
 print('done:', N, 'parcels in', len(index), 'tiles;', len(zones), 'zone strings', flush=True)

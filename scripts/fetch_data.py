@@ -18,6 +18,7 @@ WANTED = [
     ('zoning-by-law', lambda n: n == 'Zoning Height Overlay - 4326.geojson', 'height.geojson', False),
     ('zoning-by-law', lambda n: n == 'Zoning Lot Coverage Overlay - 4326.geojson', 'coverage.geojson', False),
     ('secondary-plans', lambda n: n == 'Secondary Plans Data - 4326.geojson', 'sp.geojson', False),
+    ('former-municipality-boundaries', lambda n: n == 'Former Municipality Boundaries Data - 4326.geojson', 'formermun.geojson', False),
     ('site-and-area-specific-policies', lambda n: n == 'Site and Area Specific Policies Data - 4326.geojson', 'sasp.geojson', False),
     ('address-points-municipal-toronto-one-address-repository', lambda n: n == 'Address Points - 4326.csv', 'addr.csv', False),
     ('minister-approved-major-transit-station-areas', lambda n: 'delineation' in n.lower(), 'mtsa', True),
