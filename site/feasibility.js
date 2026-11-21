@@ -277,6 +277,22 @@ const money = (v) => {
 const num = (v, d = 0) => v == null ? '—' : Number(v).toLocaleString('en-CA', { maximumFractionDigits: d, minimumFractionDigits: d });
 const fact = (k, v, note) => `<div class="fact"><span class="fk">${esc(k)}</span><span class="fv">${v}</span>${note ? `<span class="fn">${note}</span>` : ''}</div>`;
 
+// Site flags as [css class, text], shared by the site panel and the report
+function siteFlagList(f) {
+  const out = [];
+  if (f.condo) out.push(['warn', 'Registered condominium: needs the condo corporation to sell']);
+  if (f.heritage.length) out.push(['warn', `Heritage: ${f.heritage.map((h) => h === 'Part IV' ? 'Designated (Part IV)' : h === 'Part V' ? 'Heritage Conservation District (Part V)' : 'Listed').join(', ')}`]);
+  if (f.env & 1) out.push(['water', 'In the TRCA regulatory floodplain']);
+  if (f.env & 2) out.push(['warn', 'TRCA regulated area: permit needed']);
+  if (f.ravine) out.push(['warn', 'Ravine and natural feature protection area']);
+  if (f.env & 4) out.push(['warn', 'Environmentally Significant Area']);
+  if (f.env & 8) out.push(['', 'Natural Heritage System']);
+  if (f.unzoned) out.push(['bylaw', 'Former by-law area']);
+  if (f.holding) out.push(['warn', 'Holding (H) symbol on the zoning']);
+  if (f.mtsa.length) out.push(['good', `${f.mtsa[0][0]} station area (${f.mtsa[0][1].replace(' Major Transit Station Area', ' MTSA')})`]);
+  return out;
+}
+
 function renderSite() {
   const empty = !site.parcels.length;
   $('siteEmpty').hidden = !empty;
@@ -290,17 +306,7 @@ function renderSite() {
     : (f.addrs.length > 1 ? `Also ${f.addrs.slice(1).join(', ')}` : `Parcel ${site.parcels[0].id}`);
 
   // Site
-  const flags = [];
-  if (f.condo) flags.push('<span class="flag warn">Registered condominium: needs the condo corporation to sell</span>');
-  if (f.heritage.length) flags.push(`<span class="flag warn">Heritage: ${esc(f.heritage.map((h) => h === 'Part IV' ? 'Designated (Part IV)' : h === 'Part V' ? 'Heritage Conservation District (Part V)' : 'Listed').join(', '))}</span>`);
-  if (f.env & 1) flags.push('<span class="flag water">In the TRCA regulatory floodplain</span>');
-  if (f.env & 2) flags.push('<span class="flag warn">TRCA regulated area: permit needed</span>');
-  if (f.ravine) flags.push('<span class="flag warn">Ravine and natural feature protection area</span>');
-  if (f.env & 4) flags.push('<span class="flag warn">Environmentally Significant Area</span>');
-  if (f.env & 8) flags.push('<span class="flag">Natural Heritage System</span>');
-  if (f.unzoned) flags.push('<span class="flag bylaw">Former by-law area</span>');
-  if (f.holding) flags.push('<span class="flag warn">Holding (H) symbol on the zoning</span>');
-  if (f.mtsa.length) flags.push(`<span class="flag good">${esc(f.mtsa[0][0])} station area (${esc(f.mtsa[0][1].replace(' Major Transit Station Area', ' MTSA'))})</span>`);
+  const flags = siteFlagList(f).map(([cls, t]) => `<span class="flag${cls ? ' ' + cls : ''}">${esc(t)}</span>`);
   $('siteFlags').innerHTML = flags.join('') || '<span class="flag">No heritage, ravine or condominium flags</span>';
 
   $('siteFacts').innerHTML = [

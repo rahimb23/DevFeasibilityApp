@@ -323,6 +323,7 @@ details.pf-details summary { cursor: pointer; font-weight: 600; font-size: 13px;
           <div class="site-actions">
             <label><input type="checkbox" id="assemble"> Assemble: click to add or remove parcels</label>
             <button class="btn" id="clearSite">Clear</button>
+            <button class="btn primary" id="siteReport" title="Open a printable report for this site">Download report</button>
           </div>
         </section>
         <section><h2>Site</h2><div id="siteFacts"></div></section>
@@ -536,6 +537,7 @@ legend.addTo(map);
 // ---------- Data ----------
 let APPS = [];
 let WARDS = null;
+let DATA_META = null;
 let current = [];
 let shown = 50;
 let selectedId = null;
@@ -874,6 +876,7 @@ $('csv').addEventListener('click', async () => {
     const res = await fetch('applications.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const { meta, cols, rows } = await res.json();
+    DATA_META = meta;
     APPS = rows.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])));
     $('freshness').textContent = `${fmt.format(meta.applications)} applications across the city`;
     $('snap').textContent = `Snapshot of City data updated ${fmtDate((meta.sourceUpdated || '').slice(0, 10))}`;
@@ -890,5 +893,6 @@ $('csv').addEventListener('click', async () => {
 </script>
 <script src="feasibility.js"></script>
 <script src="layers.js"></script>
+<script src="report.js"></script>
 </body>
 </html>
