@@ -10,6 +10,13 @@ A map of City of Toronto development applications with a site feasibility tool.
   - density on nearby approved and proposed projects
   - a residual land value pro forma, with assumptions you can edit and a price/cost sensitivity grid
 
+- **Feasibility report:** *Create feasibility report* in the site panel builds a printable report (Print or save as PDF) for the selected site:
+  - a summary that reads the result, with break-even pricing and the ±5% sensitivity
+  - the parcel schedule and a site plan
+  - planning controls
+  - a precedent map and table
+  - the density scenarios, with the land value a rezoning would add
+  - the full pro forma, the sensitivity grid, the assumptions (edited values marked) and the method
 - **Map layers** (switch on and off with the *Map layers* panel):
   - former by-law areas, outlined in yellow
   - TRCA regulatory floodplain

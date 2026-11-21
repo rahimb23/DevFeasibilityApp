@@ -215,6 +215,8 @@ function precedents(f) {
   const out = [];
   for (const a of APPS) {
     if (!a.fsi || !a.pts.length || !['OZ', 'SA'].includes(a.type) || (a.submitted || '') < since) continue;
+    // leave out applications on the selected site itself
+    if (site.parcels.some((sp) => a.pts.some((q) => q[0] >= sp.bb[1] && q[0] <= sp.bb[3] && q[1] >= sp.bb[0] && q[1] <= sp.bb[2] && inRing(q[0], q[1], sp.pts)))) continue;
     let d = Infinity; for (const p of a.pts) d = Math.min(d, haversine(f.lat, f.lon, p[0], p[1]));
     if (d <= site.precRadius && !a.status.toLowerCase().includes('refused')) out.push({ a, d });
   }
