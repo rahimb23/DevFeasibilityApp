@@ -9,6 +9,7 @@ A map of City of Toronto development applications with a site feasibility tool.
   - Secondary Plan, Site and Area Specific Policies, Major Transit Station Area, heritage and ravine flags
   - density on nearby approved and proposed projects
   - a residual land value pro forma, with assumptions you can edit and a price/cost sensitivity grid
+  - **Download report**: a printable, letter-size site report for the selected parcel or assembly (summary, parcel schedule, planning controls, precedent map, density scenarios, pro forma, sensitivity, assumptions and method). It opens in a new tab with *Save as PDF* and *Download HTML* buttons.
 
 - **Map layers** (switch on and off with the *Map layers* panel):
   - former by-law areas, outlined in yellow
@@ -32,7 +33,7 @@ One-time setup: in the repo, open **Settings → Pages** and set **Source** to *
 
 | Path | What it is |
 |---|---|
-| `site/` | The page: `index.html`, `feasibility.js` (parcel panel and RLV model), `streets.js` (street basemap and address search) |
+| `site/` | The page: `index.html`, `feasibility.js` (parcel panel and RLV model), `report.js` (printable site report), `streets.js` (street basemap and address search) |
 | `build.sh` | Downloads the data and builds the complete site into `_site/` |
 | `scripts/fetch_data.py` | Downloads the City datasets (looked up by name through the CKAN API) |
 | `scripts/export_apps.js` | Pulls the development applications feed and groups it into one record per application |
