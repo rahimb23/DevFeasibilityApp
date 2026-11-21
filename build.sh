@@ -12,5 +12,6 @@ python3 scripts/build_snapshot.py data/apps.json "$RAW/centreline.geojson" "$RAW
 python3 scripts/build_precedents.py "$OUT/applications.json" "$RAW/parcels.geojson"
 python3 scripts/build_parcels.py "$RAW" "$OUT"
 python3 scripts/build_layers.py "$RAW" "$OUT"
+python3 scripts/build_opportunities.py "$OUT"
 touch "$OUT/.nojekyll"
 echo "Built $(find "$OUT" -type f | wc -l) files, $(du -sh "$OUT" | cut -f1)"

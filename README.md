@@ -10,6 +10,10 @@ A map of City of Toronto development applications with a site feasibility tool.
   - density on nearby approved and proposed projects
   - a residual land value pro forma, with assumptions you can edit and a price/cost sensitivity grid
 
+- **Opportunities:** every parcel gets a development opportunity score out of 100. It adds points for zoning (up to 25), transit station area (20), room to add density compared with nearby approvals (25), lot size (15), recent applications nearby (10) and a Secondary Plan (5), and takes points off for TRCA, ravine, natural heritage and heritage constraints.
+  - Left out entirely: condos, designated heritage, floodplain land, parks, employment and institutional zones, small lots, and sites with a recent application.
+  - Shown as a ranked list (filter by score, lot size and map view), a heat-coloured map layer, and a per-site breakdown in the site panel.
+  - Built by `scripts/build_opportunities.py`.
 - **Feasibility report:** *Create feasibility report* in the site panel builds a printable report (Print or save as PDF) for the selected site:
   - a summary that reads the result, with break-even pricing and the ±5% sensitivity
   - the parcel schedule and a site plan
@@ -46,6 +50,7 @@ One-time setup: in the repo, open **Settings → Pages** and set **Source** to *
 | `scripts/build_snapshot.py` | Writes `applications.json`, `streets.json` (basemap and geocoder) and `wards.json` |
 | `scripts/build_precedents.py` | Adds GFA, site area and FSI to each application |
 | `scripts/build_layers.py` | Writes the flood and environmental map layers to `layers/`, clipped to the city |
+| `scripts/build_opportunities.py` | Scores every parcel for development opportunity; writes `opportunities.json` and an `opp` column in the parcel tiles |
 | `scripts/build_parcels.py` | Joins every parcel to zoning, overlays, policies, heritage, ravines, 3D massing and addresses, then writes map tiles |
 | `server.js`, `public/` | Optional live Node server (radar only) that proxies the City feed |
 
