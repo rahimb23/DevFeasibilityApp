@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Map of City of Toronto development applications with site feasibility and residual land value.">
+<title>Toronto Development Radar</title>
+<style>
+.leaflet-image-layer,.leaflet-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-pane>canvas,.leaflet-pane>svg,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{position:absolute;left:0;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::selection{background:0 0}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-width:none!important;max-height:none!important;width:auto;padding:0}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{-ms-touch-action:pinch-zoom;touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{-ms-touch-action:none;touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{width:0;height:0;-moz-box-sizing:border-box;box-sizing:border-box;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{width:1px;height:1px}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted;pointer-events:auto}.leaflet-bottom,.leaflet-top{position:absolute;z-index:1000;pointer-events:none}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{float:left;clear:both}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}.leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity .2s linear;-moz-transition:opacity .2s linear;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{-webkit-transform-origin:0 0;-ms-transform-origin:0 0;transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{-webkit-transition:-webkit-transform .25s cubic-bezier(0,0,.25,1);-moz-transition:-moz-transform .25s cubic-bezier(0,0,.25,1);transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{-webkit-transition:none;-moz-transition:none;transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:-webkit-grab;cursor:-moz-grab;cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;cursor:grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:1px}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,.5)}.leaflet-container{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;font-size:12px;font-size:.75rem;line-height:1.5}.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:focus,.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}.leaflet-touch .leaflet-bar a{width:30px;height:30px;line-height:30px}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:2px;border-top-right-radius:2px}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:2px;border-bottom-right-radius:2px}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:22px}.leaflet-control-layers{box-shadow:0 1px 5px rgba(0,0,0,.4);background:#fff;border-radius:5px}.leaflet-control-layers-toggle{background-image:url(data:,layers.png);width:36px;height:36px}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(data:,layers-2x.png);background-size:26px 26px}.leaflet-touch .leaflet-control-layers-toggle{width:44px;height:44px}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:#333;background:#fff}.leaflet-control-layers-scrollbar{overflow-y:scroll;overflow-x:hidden;padding-right:5px}.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px}.leaflet-control-layers label{display:block;font-size:13px;font-size:1.08333em}.leaflet-control-layers-separator{height:0;border-top:1px solid #ddd;margin:5px -10px 5px -6px}.leaflet-default-icon-path{background-image:url(data:,marker-icon.png)}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{padding:0 5px;color:#333;line-height:1.4}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:focus,.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}.leaflet-left .leaflet-control-scale{margin-left:5px}.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;-moz-box-sizing:border-box;box-sizing:border-box;background:rgba(255,255,255,.8);text-shadow:1px 1px #fff}.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{border:2px solid rgba(0,0,0,.2);background-clip:padding-box}.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:13px;font-size:1.08333em;min-height:1px}.leaflet-popup-content p{margin:17px 0;margin:1.3em 0}.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);transform:rotate(45deg)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:0 0}.leaflet-container a.leaflet-popup-close-button:focus,.leaflet-container a.leaflet-popup-close-button:hover{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{width:24px;margin:0 auto}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:1px solid #999}.leaflet-div-icon{background:#fff;border:1px solid #666}.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{position:absolute;pointer-events:none;border:6px solid transparent;background:0 0;content:""}.leaflet-tooltip-bottom{margin-top:6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-6px}.leaflet-tooltip-top:before{bottom:0;margin-bottom:-12px;border-top-color:#fff}.leaflet-tooltip-bottom:before{top:0;margin-top:-12px;margin-left:-6px;border-bottom-color:#fff}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{top:50%;margin-top:-6px}.leaflet-tooltip-left:before{right:0;margin-right:-12px;border-left-color:#fff}.leaflet-tooltip-right:before{left:0;margin-left:-12px;border-right-color:#fff}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+:root {
+  --bg: #f6f6f3; --panel: #ffffff; --ink: #1c1d1f; --muted: #66686d; --line: #e3e3de; --soft: #f0f0ec;
+  --accent: #1f5fbf; --accent-ink: #ffffff; --ring: rgba(31,95,191,.25);
+  --c-OZ: #2a6fd6; --c-SA: #d9682a; --c-CD: #2a9467; --c-SB: #8a56d1; --c-PL: #c9416b;
+  --open: #2a9467; --closed: #8d8f94;
+  --land: #ecebe6; --road: #ffffff; --casing: #d3d1c9; --hwy: #f4d79a; --hwy-casing: #d8b468; --water: #9cc3e0; --water-fill: #cfe1ee; --rail: #b3b1aa; --trail: #a9c79a; --label: #55565a; --halo: #ecebe6; --ward: #8a8da0; --parcel: rgba(70,72,80,.45); --pos: #2a9467; --neg: #c9416b;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131416; --panel: #1b1c1f; --ink: #ececea; --muted: #9a9ca1; --line: #2c2d31; --soft: #232428;
+    --accent: #6ea2f2; --accent-ink: #0d1420; --ring: rgba(110,162,242,.3);
+    --c-OZ: #5d97f0; --c-SA: #ee8a52; --c-CD: #4bb98a; --c-SB: #a982ea; --c-PL: #e66a90;
+    --open: #4bb98a; --closed: #77797e;
+    --land: #1e2024; --road: #34373d; --casing: #2a2c31; --hwy: #6b5a35; --hwy-casing: #4d4128; --water: #3d5f7c; --water-fill: #1b2a38; --rail: #4a4c52; --trail: #34503a; --label: #b4b6bb; --halo: #1e2024; --ward: #6c7086; --parcel: rgba(200,204,215,.35); --pos: #3fae7f; --neg: #e0607f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131416; --panel: #1b1c1f; --ink: #ececea; --muted: #9a9ca1; --line: #2c2d31; --soft: #232428;
+  --accent: #6ea2f2; --accent-ink: #0d1420; --ring: rgba(110,162,242,.3);
+  --c-OZ: #5d97f0; --c-SA: #ee8a52; --c-CD: #4bb98a; --c-SB: #a982ea; --c-PL: #e66a90;
+  --open: #4bb98a; --closed: #77797e;
+  --land: #1e2024; --road: #34373d; --casing: #2a2c31; --hwy: #6b5a35; --hwy-casing: #4d4128; --water: #3d5f7c; --water-fill: #1b2a38; --rail: #4a4c52; --trail: #34503a; --label: #b4b6bb; --halo: #1e2024; --ward: #6c7086; --parcel: rgba(200,204,215,.35); --pos: #3fae7f; --neg: #e0607f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+button, input, select { font: inherit; color: inherit; }
+html, body { height: 100%; }
+.app { display: grid; grid-template-columns: 420px 1fr; height: 100%; }
+aside { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; display: flex; flex-direction: column; }
+#map { height: 100%; min-height: 300px; background: var(--water-fill); }
+header { padding: 18px max(20px, env(safe-area-inset-left, 0px)) 10px; }
+h1 { font-size: 18px; margin: 0; letter-spacing: -.01em; }
+.sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+section { padding: 12px 20px; border-top: 1px solid var(--line); }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+.row { display: flex; gap: 8px; align-items: center; }
+.search { position: relative; }
+.search input { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.suggest { position: absolute; z-index: 1000; left: 0; right: 0; top: 100%; margin-top: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12); overflow: hidden; }
+.suggest button { display: block; width: 100%; text-align: left; padding: 8px 12px; border: 0; background: none; cursor: pointer; font-size: 13px; }
+.suggest button:hover, .suggest button:focus { background: var(--soft); }
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 7px 11px; cursor: pointer; white-space: nowrap; }
+.btn:hover { background: var(--soft); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+input[type=range] { flex: 1; accent-color: var(--accent); }
+.radius-val { min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: none; padding: 6px 10px; cursor: pointer; }
+.seg button[aria-pressed=true] { background: var(--accent); color: var(--accent-ink); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px 4px 8px; cursor: pointer; user-select: none; font-size: 13px; }
+.chip input { display: none; }
+.chip .dot { width: 9px; height: 9px; border-radius: 50%; }
+.chip:has(input:not(:checked)) { opacity: .45; }
+.filters { display: grid; gap: 10px; }
+.filters label.f { display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.filters select, .filters input[type=text] { padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); width: 100%; }
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.tile { background: var(--soft); border-radius: 10px; padding: 10px 12px; }
+.tile .v { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.tile .k { color: var(--muted); font-size: 12px; }
+.bars { display: grid; gap: 5px; margin-top: 4px; }
+.bar { display: grid; grid-template-columns: 150px 1fr 40px; gap: 8px; align-items: center; font-size: 12px; }
+.bar .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .track { height: 8px; background: var(--soft); border-radius: 4px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 4px; background: var(--accent); }
+.bar .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.years { display: flex; align-items: flex-end; gap: 2px; height: 70px; margin-top: 6px; }
+.years div { flex: 1; background: var(--accent); border-radius: 2px 2px 0 0; min-height: 1px; opacity: .85; }
+.years-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-top: 3px; }
+.list-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.list-head select { padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.card { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; background: var(--panel); }
+.card:hover, .card.sel { border-color: var(--accent); }
+.card .top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.card .addr { font-weight: 600; margin: 4px 0 2px; }
+.card .desc { color: var(--muted); font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card.sel .desc { -webkit-line-clamp: unset; display: block; }
+.card .meta { font-size: 12px; margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+.card a { color: var(--accent); }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--ink); }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+.pill { padding: 1px 7px; border-radius: 999px; font-size: 11px; border: 1px solid var(--line); }
+.pill.open { color: var(--open); border-color: currentColor; }
+.empty, .loading { color: var(--muted); padding: 16px 0; text-align: center; }
+.more { width: 100%; }
+footer { padding: 12px 20px 18px; color: var(--muted); font-size: 11.5px; border-top: 1px solid var(--line); margin-top: auto; }
+footer a { color: inherit; }
+.leaflet-container { font: inherit; }
+.basemap { filter: saturate(.35) contrast(.95) brightness(1.04); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .basemap { filter: invert(1) hue-rotate(180deg) saturate(.3) brightness(.85) contrast(.9); } }
+:root[data-theme="dark"] .basemap { filter: invert(1) hue-rotate(180deg) saturate(.3) brightness(.85) contrast(.9); }
+.leaflet-popup-content { margin: 10px 12px; font-size: 13px; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--panel); color: var(--ink); }
+.pop-addr { font-weight: 600; }
+.pop a { color: var(--accent); }
+.center-pin { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.4); }
+.legend { background: var(--panel); color: var(--ink); padding: 8px 10px; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,.2); font-size: 12px; line-height: 1.7; }
+.legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+.err { background: var(--soft); color: var(--ink); border-left: 3px solid #c9416b; padding: 10px 12px; border-radius: 8px; margin: 10px 20px; font-size: 13px; }
+@media (max-width: 860px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 55vh auto; height: auto; }
+  aside { min-width: 0; }
+  .fact { grid-template-columns: 118px minmax(0, 1fr); }
+  .pfin em { width: 70px; }
+  .pfin input { width: 84px; }
+  #map { grid-row: 1; height: 55vh; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 1; }
+  aside { grid-row: 2; border-right: 0; overflow: visible; }
+  header, section, footer { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .bar { grid-template-columns: 110px 1fr 36px; }
+  .legend { display: none; }
+}
+
+.basemap-tile { pointer-events: none; }
+.tabs { display: flex; gap: 4px; padding: 0 max(20px, env(safe-area-inset-left, 0px)) 12px; }
+.tabs button { flex: 1; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 10px; cursor: pointer; font-weight: 600; color: var(--muted); }
+.tabs button[aria-selected=true] { background: var(--accent); border-color: transparent; color: var(--accent-ink); }
+.fact { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 2px 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.fact:last-child { border-bottom: 0; }
+.fk { color: var(--muted); }
+.fv { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.fv code { font: 600 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+.fn { grid-column: 2; color: var(--muted); font-size: 12px; }
+.fn-inline { color: var(--muted); font-size: 12px; font-weight: 400; margin-left: 6px; }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.flag { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--soft); color: var(--muted); }
+.flag.warn { color: var(--neg); background: color-mix(in srgb, var(--neg) 12%, transparent); }
+.flag.good { color: var(--pos); background: color-mix(in srgb, var(--pos) 12%, transparent); }
+.site-title { font-size: 17px; font-weight: 650; margin: 0; }
+.site-actions { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 10px; font-size: 13px; }
+.site-actions label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.prec { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; cursor: pointer; }
+.prec:hover b { color: var(--accent); }
+.prec .pv { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--muted); }
+.scen { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.scen button { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 7px 8px; cursor: pointer; text-align: left; font-size: 13px; font-weight: 600; }
+.scen button small { display: block; font-weight: 400; color: var(--muted); font-size: 11.5px; }
+.scen button[aria-pressed=true] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.scen button:disabled { opacity: .45; cursor: default; }
+.rlv { background: color-mix(in srgb, var(--pos) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--pos) 35%, transparent); border-radius: 12px; padding: 14px; }
+.rlv.neg { background: color-mix(in srgb, var(--neg) 10%, var(--panel)); border-color: color-mix(in srgb, var(--neg) 40%, transparent); }
+.rlv .big { font-size: 30px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.rlv .note { color: var(--muted); font-size: 12.5px; }
+.rlv-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.rlv-stats .v { font-weight: 650; font-variant-numeric: tabular-nums; }
+.rlv-stats .k { color: var(--muted); font-size: 11.5px; }
+.pf-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.pf-table td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.pf-table td:nth-child(2), .pf-table td:nth-child(3) { text-align: right; padding-left: 8px; white-space: nowrap; }
+.pf-table td:nth-child(3) { color: var(--muted); width: 52px; }
+.pf-table tr.sub td { font-weight: 650; }
+.pf-table tr.total td { font-weight: 750; border-bottom: 0; border-top: 2px solid var(--ink); }
+.sens-wrap { overflow-x: auto; }
+.sens { border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; width: 100%; }
+.sens th, .sens td { padding: 5px 3px; text-align: right; white-space: nowrap; }
+.sens { font-size: 11.5px; }
+.sens thead th { color: var(--muted); font-weight: 500; }
+.sens tbody th { color: var(--muted); font-weight: 500; text-align: left; }
+.sens td.base { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 700; }
+fieldset { border: 0; margin: 0 0 10px; padding: 0; }
+legend { font-size: 12px; font-weight: 650; padding: 0; margin-bottom: 4px; }
+.pf { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 3px 0; font-size: 13px; color: var(--muted); }
+.pfin { display: inline-flex; align-items: center; gap: 6px; }
+.pfin input { width: 96px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); text-align: right; font-variant-numeric: tabular-nums; }
+.pfin em { font-style: normal; font-size: 11.5px; width: 92px; color: var(--muted); }
+details.pf-details summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 4px 0; }
+.msg { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.leaflet-container { background: var(--water-fill); }
+.kind { color: var(--muted); font-size: 11px; margin-left: 6px; }
+.snap { display: inline-block; margin-top: 6px; font-size: 11.5px; color: var(--muted); background: var(--soft); border-radius: 6px; padding: 3px 8px; }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--panel) 85%, transparent) !important; color: var(--muted) !important; }
+.leaflet-control-attribution a { color: var(--muted) !important; }
+.leaflet-bar a { background: var(--panel); color: var(--ink); border-bottom-color: var(--line); }
+.leaflet-bar a:hover { background: var(--soft); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="streets.js"></script>
+
+</head>
+<body>
+<div class="app">
+  <aside>
+    <header>
+      <h1>Toronto Development Radar</h1>
+      <div class="sub" id="freshness">Loading the City of Toronto feed…</div>
+      <div class="snap" id="snap" hidden></div>
+    </header>
+    <div class="tabs" id="tabs" role="tablist">
+      <button role="tab" data-tab="radar" aria-selected="true">Area radar</button>
+      <button role="tab" data-tab="site" aria-selected="false">Site feasibility</button>
+    </div>
+    <div id="radarPane">
+
+    <section>
+      <h2>Centre point</h2>
+      <div class="search">
+        <div class="row">
+          <input id="q" type="search" placeholder="e.g. 2180 Yonge St, King &amp; Spadina, Ward 10" autocomplete="off" aria-label="Search address">
+                  </div>
+        <div class="suggest" id="suggest" hidden></div>
+      </div>
+      <div class="hint">Type an address, two cross streets, or a ward name. You can also click the map or drag the blue pin.</div>
+    </section>
+
+    <section>
+      <h2>Radius</h2>
+      <div class="row">
+        <input id="radius" type="range" min="100" max="5000" step="50" value="1000" aria-label="Radius in metres">
+        <span class="radius-val" id="radiusVal">1.0 km</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Filters</h2>
+      <div class="filters">
+        <div class="row" style="justify-content:space-between">
+          <span style="color:var(--muted);font-size:13px">Status</span>
+          <div class="seg" id="statusSeg" role="group" aria-label="Status filter">
+            <button data-v="open" aria-pressed="true">Open</button>
+            <button data-v="closed" aria-pressed="false">Closed</button>
+            <button data-v="all" aria-pressed="false">All</button>
+          </div>
+        </div>
+        <div class="chips" id="typeChips"></div>
+        <label class="f">Submitted <select id="since"></select></label>
+        <label class="f">Keyword <input id="kw" type="text" placeholder="e.g. rental, storey, hotel"></label>
+      </div>
+    </section>
+
+    <section>
+      <h2>In this radius</h2>
+      <div class="tiles">
+        <div class="tile"><div class="v" id="tApps">–</div><div class="k">applications</div></div>
+        <div class="tile"><div class="v" id="tOpen">–</div><div class="k">still open</div></div>
+        <div class="tile"><div class="v" id="tUnits">–</div><div class="k">units proposed*</div></div>
+        <div class="tile"><div class="v" id="tStoreys">–</div><div class="k">tallest proposal (storeys)</div></div>
+      </div>
+      <div class="hint">* Unit and storey counts are read from the application descriptions. The same project can show up as more than one file (for example a rezoning and a site plan), so the total keeps one figure per project to avoid counting it twice. Treat it as an estimate.</div>
+    </section>
+
+    <section>
+      <h2>By application type</h2>
+      <div class="bars" id="byType"></div>
+    </section>
+    <section>
+      <h2>By status</h2>
+      <div class="bars" id="byStatus"></div>
+    </section>
+    <section>
+      <h2>Submitted per year</h2>
+      <div class="years" id="byYear"></div>
+      <div class="years-axis" id="byYearAxis"></div>
+    </section>
+    <section id="meetingsSec" hidden>
+      <h2>Upcoming community meetings</h2>
+      <div id="meetings"></div>
+    </section>
+
+    <section>
+      <div class="list-head">
+        <h2 style="margin:0">Applications</h2>
+        <div class="row">
+          <select id="sort" aria-label="Sort">
+            <option value="dist">Nearest</option>
+            <option value="new">Newest</option>
+            <option value="units">Most units</option>
+            <option value="storeys">Tallest</option>
+          </select>
+          <button class="btn" id="csv" hidden>Save CSV</button>
+        </div>
+      </div>
+      <div id="list"><div class="loading">Loading…</div></div>
+    </section>
+
+    </div>
+
+    <div id="sitePane" hidden>
+      <section id="siteEmpty">
+        <h2>Pick a site</h2>
+        <p style="margin:0 0 10px">Zoom in to street level and click a property parcel. Turn on “Assemble” to add neighbouring parcels into one site.</p>
+        <button class="btn primary" id="useCentre">Use the parcel at the radar centre</button>
+        <div class="msg" id="siteMsg" hidden></div>
+      </section>
+      <div id="siteBody" hidden>
+        <section>
+          <p class="site-title" id="siteTitle"></p>
+          <div class="sub" id="siteSub"></div>
+          <div class="flags" id="siteFlags"></div>
+          <div class="site-actions">
+            <label><input type="checkbox" id="assemble"> Assemble: click to add or remove parcels</label>
+            <button class="btn" id="clearSite">Clear</button>
+          </div>
+        </section>
+        <section><h2>Site</h2><div id="siteFacts"></div></section>
+        <section><h2>Planning controls</h2><div id="sitePlanning"></div></section>
+        <section>
+          <div class="list-head"><h2 style="margin:0">Nearby precedents</h2>
+            <select id="precRadius" aria-label="Precedent search radius"><option value="500">500 m</option><option value="750" selected>750 m</option><option value="1000">1 km</option><option value="1500">1.5 km</option><option value="2500">2.5 km</option></select></div>
+          <div id="precSummary"></div>
+          <div id="precList" style="margin-top:6px"></div>
+        </section>
+        <section>
+          <h2>Density scenario</h2>
+          <div class="scen" id="scenario"></div>
+          <label class="pf" id="customFsiRow" hidden style="margin-top:8px"><span>Custom FSI</span><span class="pfin"><input type="number" id="customFsi" step="0.1" min="0.1"><em>× lot area</em></span></label>
+        </section>
+        <section>
+          <h2>Residual land value</h2>
+          <div class="rlv" id="rlvBox"><div class="big" id="rlvTotal"></div><div class="note" id="rlvNote"></div><div class="rlv-stats" id="rlvStats"></div></div>
+          <div id="massing" style="margin-top:10px"></div>
+        </section>
+        <section>
+          <h2>Pro forma</h2>
+          <table class="pf-table" id="pfTable"></table>
+        </section>
+        <section>
+          <h2>Sensitivity: sale price (rows) vs hard cost (columns)</h2>
+          <div class="sens-wrap"><table class="sens" id="sens"></table></div>
+        </section>
+        <section>
+          <details class="pf-details" open>
+            <summary>Assumptions</summary>
+            <div class="hint" style="margin:4px 0 10px">Starting values are rough Toronto high-rise condo figures for late 2026. Replace them with your own market and cost numbers. Changes are saved in this browser.</div>
+            <div id="pfInputs"></div>
+            <button class="btn" id="pfReset">Reset to defaults</button>
+          </details>
+          <div class="hint" style="margin-top:10px">Residual land value = revenue − hard and soft costs − development charges − demolition − sales − financing − profit, then divided by (1 + land closing % + parkland % + CBC % + land carry). This is a screening estimate, not an appraisal: it ignores HST, phasing, inclusionary zoning and site-specific costs.</div>
+        </section>
+      </div>
+    </div>
+
+    <footer>
+      Data: <a href="https://open.toronto.ca/dataset/development-applications/" target="_blank" rel="noopener">Development Applications</a>, <a href="https://open.toronto.ca/dataset/toronto-centreline-tcl/" target="_blank" rel="noopener">Toronto Centreline</a> and <a href="https://open.toronto.ca/dataset/city-wards/" target="_blank" rel="noopener">City Wards</a>, City of Toronto Open Data (Open Government Licence – Toronto). Site analysis uses Property Boundaries, Zoning By-law 569-2013 (zones, height and coverage overlays), Secondary Plans, Site and Area Specific Policies, Major Transit Station Areas, the Heritage Register, Ravine Protection and 3D Massing, all City of Toronto Open Data. This page holds a snapshot of those datasets.
+    </footer>
+  </aside>
+  <div id="map"></div>
+</div>
+
+<script>
+'use strict';
+const TYPE_LABEL = {
+  OZ: 'Official Plan / Rezoning', SA: 'Site Plan Approval', CD: 'Condominium (Draft Plan)',
+  SB: 'Plan of Subdivision', PL: 'Part Lot Control',
+};
+const CLOSED = new Set(['Closed', 'Refused', 'Inactive', 'Appeal Dismissed', 'OMB Refused', 'Final Approval Completed']);
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const typeColor = (t) => css('--c-' + t) || '#888';
+const fmt = new Intl.NumberFormat('en-CA');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = (id) => document.getElementById(id);
+
+// ---------- State (remembered per viewer in local storage) ----------
+const STORE_KEY = 'tdr-view-v1';
+const state = { lat: 43.70675, lon: -79.39832, r: 800, status: 'open', types: new Set(Object.keys(TYPE_LABEL)), since: '', kw: '', sort: 'dist' };
+try {
+  const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+  if (s && isFinite(s.lat) && isFinite(s.lon)) {
+    Object.assign(state, { lat: s.lat, lon: s.lon, r: Math.min(5000, Math.max(100, s.r || 800)), status: s.status || 'open', since: s.since || '', kw: s.kw || '', sort: s.sort || 'dist' });
+    if (Array.isArray(s.types)) state.types = new Set(s.types.filter((t) => TYPE_LABEL[t]));
+  }
+} catch { /* storage unavailable: start from the default view */ }
+function saveState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...state, types: [...state.types] })); } catch { /* ignore */ }
+}
+
+// ---------- Map ----------
+const map = L.map('map', { zoomControl: true, preferCanvas: true, minZoom: 10, maxZoom: 18, maxBounds: [[43.45, -79.85], [43.98, -78.95]] })
+  .setView([state.lat, state.lon], 15);
+map.attributionControl.setPrefix(false).addAttribution('Base map: City of Toronto centreline');
+const renderer = L.canvas({ padding: 0.3 });
+
+// Base map drawn from the City's street centreline, tile by tile on canvas.
+let NET = null;
+const Basemap = L.GridLayer.extend({
+  createTile(coords) {
+    const tile = document.createElement('canvas');
+    const dpr = Math.min(2, window.devicePixelRatio || 1), size = 256;
+    tile.width = tile.height = size * dpr;
+    tile.className = 'basemap-tile';
+    if (NET) drawTile(tile.getContext('2d'), coords, dpr);
+    return tile;
+  },
+});
+const WORLD = 256;
+const projX = (lon, z) => (lon + 180) / 360 * WORLD * 2 ** z;
+const projY = (lat, z) => { const s = Math.sin(lat * Math.PI / 180); return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * WORLD * 2 ** z; };
+const unX = (x, z) => x / (WORLD * 2 ** z) * 360 - 180;
+const unY = (y, z) => { const n = Math.PI - 2 * Math.PI * y / (WORLD * 2 ** z); return 180 / Math.PI * Math.atan(Math.sinh(n)); };
+
+// Class codes from the build: 1 expressway, 2 ramp, 3 major arterial, 4 minor arterial, 5 collector,
+// 6 local, 7 laneway, 8 rail, 9 shoreline, 10 river, 11 trail
+function styleFor(c, z) {
+  const k = z - 14; // widths grow with zoom
+  const g = (base) => Math.max(0.4, base * 2 ** (k * 0.55));
+  switch (c) {
+    case 1: return { minZ: 10, w: g(4.2), color: '--hwy', casing: '--hwy-casing' };
+    case 2: return { minZ: 13, w: g(2), color: '--hwy', casing: '--hwy-casing' };
+    case 3: return { minZ: 10, w: g(3.6), color: '--road', casing: '--casing' };
+    case 4: return { minZ: 11, w: g(2.8), color: '--road', casing: '--casing' };
+    case 5: return { minZ: 12, w: g(2.2), color: '--road', casing: '--casing' };
+    case 6: return { minZ: 13, w: g(1.6), color: '--road', casing: z >= 15 ? '--casing' : null };
+    case 7: return { minZ: 16, w: g(0.8), color: '--road' };
+    case 8: return { minZ: 11, w: 1.4, color: '--rail', dash: [4, 3] };
+    case 9: return { minZ: 10, w: 1.6, color: '--water' };
+    case 10: return { minZ: 11, w: z >= 14 ? 2 : 1.2, color: '--water' };
+    case 11: return { minZ: 15, w: 1, color: '--trail', dash: [2, 3] };
+  }
+  return null;
+}
+const ORDER = [9, 10, 11, 8, 7, 6, 5, 4, 3, 2, 1];
+
+function drawTile(ctx, coords, dpr) {
+  const z = coords.z, x0 = coords.x * 256, y0 = coords.y * 256, pad = 24;
+  const w = unX(x0 - pad, z), e = unX(x0 + 256 + pad, z), n = unY(y0 - pad, z), s = unY(y0 + 256 + pad, z);
+  ctx.scale(dpr, dpr);
+  ctx.fillStyle = css('--land'); ctx.fillRect(0, 0, 256, 256);
+  const ids = TDRStreets.query(NET, w, s, e, n);
+  const byClass = new Map();
+  for (const i of ids) { const c = NET.segs[i].c; (byClass.get(c) || byClass.set(c, []).get(c)).push(i); }
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const path = (sg) => {
+    ctx.moveTo(projX(sg.xs[0], z) - x0, projY(sg.ys[0], z) - y0);
+    for (let j = 1; j < sg.xs.length; j++) ctx.lineTo(projX(sg.xs[j], z) - x0, projY(sg.ys[j], z) - y0);
+  };
+  // Casings first (so road fills merge cleanly at junctions), then fills.
+  for (const pass of ['casing', 'fill']) {
+    for (const c of ORDER) {
+      const st = styleFor(c, z), list = byClass.get(c);
+      if (!st || !list || z < st.minZ) continue;
+      if (pass === 'casing' && !st.casing) continue;
+      ctx.beginPath(); for (const i of list) path(NET.segs[i]);
+      ctx.setLineDash(pass === 'fill' && st.dash ? st.dash : []);
+      ctx.strokeStyle = css(pass === 'casing' ? st.casing : st.color);
+      ctx.lineWidth = pass === 'casing' ? st.w + 1.6 : st.w;
+      ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
+  // Ward boundaries
+  if (WARDS && z <= 15) {
+    ctx.beginPath();
+    for (const wd of WARDS) for (const ring of wd.rings) {
+      ring.forEach(([lo, la], j) => { const px = projX(lo, z) - x0, py = projY(la, z) - y0; j ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+    }
+    ctx.strokeStyle = css('--ward'); ctx.globalAlpha = 0.5; ctx.lineWidth = 1.2; ctx.setLineDash([6, 4]); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+  }
+  // Street labels on the longest straight stretch of each street in the tile
+  const labelClasses = z >= 16 ? [1, 3, 4, 5, 6] : z >= 15 ? [1, 3, 4, 5] : z >= 13 ? [1, 3] : [];
+  if (!labelClasses.length) return;
+  const fontPx = z >= 16 ? 11.5 : 11;
+  ctx.font = `600 ${fontPx}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  const bestByName = new Map();
+  for (const c of labelClasses) for (const i of byClass.get(c) || []) {
+    const sg = NET.segs[i]; if (!sg.n) continue;
+    for (let j = 1; j < sg.xs.length; j++) {
+      const ax = projX(sg.xs[j - 1], z) - x0, ay = projY(sg.ys[j - 1], z) - y0, bx = projX(sg.xs[j], z) - x0, by = projY(sg.ys[j], z) - y0;
+      const len = Math.hypot(bx - ax, by - ay), mx = (ax + bx) / 2, my = (ay + by) / 2;
+      const cur = bestByName.get(sg.n);
+      if (!cur || len > cur.len) bestByName.set(sg.n, { len, mx, my, ang: Math.atan2(by - ay, bx - ax), c });
+    }
+  }
+  const placed = [];
+  const lab = [...bestByName.entries()].sort((a, b) => a[1].c - b[1].c || b[1].len - a[1].len);
+  for (const [nid, b] of lab) {
+    const text = NET.names[nid], tw = ctx.measureText(text).width;
+    if (tw + 8 > b.len) continue;
+    let ang = b.ang; if (ang > Math.PI / 2) ang -= Math.PI; if (ang < -Math.PI / 2) ang += Math.PI;
+    const hx = Math.abs(Math.cos(ang)) * tw / 2 + 6, hy = Math.abs(Math.sin(ang)) * tw / 2 + 6;
+    if (b.mx - hx < 0 || b.mx + hx > 256 || b.my - hy < 0 || b.my + hy > 256) continue; // would be cut at the tile edge
+    if (placed.some((p) => Math.abs(p[0] - b.mx) < p[2] + hx && Math.abs(p[1] - b.my) < p[3] + hy)) continue;
+    placed.push([b.mx, b.my, hx, hy]);
+    ctx.save(); ctx.translate(b.mx, b.my); ctx.rotate(ang);
+    ctx.lineWidth = 3; ctx.strokeStyle = css('--halo'); ctx.strokeText(text, 0, 0);
+    ctx.fillStyle = css('--label'); ctx.fillText(text, 0, 0);
+    ctx.restore();
+    if (placed.length > 14) break;
+  }
+}
+const basemap = new Basemap({ tileSize: 256, updateWhenZooming: false, keepBuffer: 2 }).addTo(map);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => basemap.redraw());
+new MutationObserver(() => basemap.redraw()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+const bgLayer = L.layerGroup().addTo(map);
+const fgLayer = L.layerGroup().addTo(map);
+const circle = L.circle([state.lat, state.lon], { radius: state.r, color: css('--accent'), weight: 2, fillOpacity: 0.06, interactive: false }).addTo(map);
+const pin = L.marker([state.lat, state.lon], { draggable: true, keyboard: false, icon: L.divIcon({ className: '', html: '<div class="center-pin"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }), zIndexOffset: 1000 }).addTo(map);
+pin.on('drag', (e) => circle.setLatLng(e.target.getLatLng()));
+pin.on('dragend', (e) => { const p = e.target.getLatLng(); setCentre(p.lat, p.lng, false); });
+pin.on('click', (e) => L.DomEvent.stopPropagation(e));
+map.on('click', (e) => { if (typeof siteMode !== 'undefined' && siteMode) return; setCentre(e.latlng.lat, e.latlng.lng, false); });
+
+const legend = L.control({ position: 'bottomright' });
+legend.onAdd = () => {
+  const d = L.DomUtil.create('div', 'legend');
+  d.innerHTML = Object.entries(TYPE_LABEL).map(([k, v]) => `<div><span class="dot" style="background:${typeColor(k)}"></span>${v}</div>`).join('');
+  return d;
+};
+legend.addTo(map);
+
+// ---------- Data ----------
+let APPS = [];
+let WARDS = null;
+let current = [];
+let shown = 50;
+let selectedId = null;
+const markerById = new Map();
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371008.8, toR = Math.PI / 180;
+  const dLat = (lat2 - lat1) * toR, dLon = (lon2 - lon1) * toR;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * toR) * Math.cos(lat2 * toR) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function passesFilters(a) {
+  if (!state.types.has(a.type)) return false;
+  const closed = CLOSED.has(a.status);
+  if (state.status === 'open' && closed) return false;
+  if (state.status === 'closed' && !closed) return false;
+  if (state.since && (a.submitted || '') < state.since) return false;
+  if (state.kw) {
+    const k = state.kw.toLowerCase();
+    if (!(a.desc.toLowerCase().includes(k) || a.addrs.join(' ').toLowerCase().includes(k) || a.id.toLowerCase().includes(k))) return false;
+  }
+  return true;
+}
+
+function compute() {
+  const filtered = APPS.filter(passesFilters);
+  const inside = [];
+  for (const a of filtered) {
+    let best = Infinity, bestPt = null;
+    for (const p of a.pts) {
+      const d = haversine(state.lat, state.lon, p[0], p[1]);
+      if (d < best) { best = d; bestPt = p; }
+    }
+    a._dist = best; a._pt = bestPt;
+    if (best <= state.r) inside.push(a);
+  }
+  return { filtered, inside };
+}
+
+function sortList(list) {
+  const by = {
+    dist: (a, b) => a._dist - b._dist,
+    new: (a, b) => (b.submitted || '').localeCompare(a.submitted || ''),
+    units: (a, b) => (b.units || 0) - (a.units || 0),
+    storeys: (a, b) => (b.storeys || 0) - (a.storeys || 0),
+  }[state.sort] || ((a, b) => a._dist - b._dist);
+  return list.slice().sort(by);
+}
+
+const fmtDate = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+const fmtRadius = (m) => m < 1000 ? `${m} m` : `${+(m / 1000).toFixed(2)} km`;
+const fmtDist = (m) => m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(2)} km`;
+
+// ---------- Render ----------
+function render() {
+  saveState();
+  circle.setLatLng([state.lat, state.lon]).setRadius(state.r);
+  pin.setLatLng([state.lat, state.lon]);
+  $('radiusVal').textContent = fmtRadius(state.r);
+  if (!APPS.length) return;
+
+  const { filtered, inside } = compute();
+  current = sortList(inside);
+
+  bgLayer.clearLayers(); fgLayer.clearLayers(); markerById.clear();
+  const grey = css('--closed');
+  const insideSet = new Set(inside);
+  for (const a of filtered) {
+    if (!a._pt || insideSet.has(a)) continue;
+    L.circleMarker(a._pt, { renderer, radius: 3, stroke: false, fillColor: grey, fillOpacity: 0.5 })
+      .on('click', () => selectApp(a, true)).addTo(bgLayer);
+  }
+  for (const a of inside) {
+    const open = !CLOSED.has(a.status);
+    const m = L.circleMarker(a._pt, {
+      renderer, radius: open ? 7 : 5, color: '#fff', weight: 1.5, fillColor: typeColor(a.type), fillOpacity: open ? 0.95 : 0.55,
+    }).bindPopup(() => popupHtml(a), { maxWidth: 300 }).on('click', () => selectApp(a, false)).addTo(fgLayer);
+    markerById.set(a.id, m);
+  }
+
+  $('tApps').textContent = fmt.format(inside.length);
+  $('tOpen').textContent = fmt.format(inside.filter((a) => !CLOSED.has(a.status)).length);
+  // Related files (a rezoning, then its site plan) repeat the same unit count: keep the largest
+  // figure per parent file, and skip a repeat of the same count at the same address.
+  const unitsByProject = new Map(), seen = new Set();
+  for (const a of inside.slice().sort((x, y) => (y.units || 0) - (x.units || 0))) {
+    if (!a.units) continue;
+    const sig = (a.addrs[0] || '') + '|' + a.units;
+    if (seen.has(sig)) continue;
+    seen.add(sig);
+    const key = a.parent || a.id;
+    unitsByProject.set(key, Math.max(unitsByProject.get(key) || 0, a.units));
+  }
+  const totalUnits = [...unitsByProject.values()].reduce((s, n) => s + n, 0);
+  $('tUnits').textContent = totalUnits ? fmt.format(totalUnits) : '–';
+  const tallest = Math.max(0, ...inside.map((a) => a.storeys || 0));
+  $('tStoreys').textContent = tallest || '–';
+
+  const count = (key) => inside.reduce((m, a) => m.set(key(a), (m.get(key(a)) || 0) + 1), new Map());
+  bars('byType', [...count((a) => a.type)].sort((a, b) => b[1] - a[1]), (k) => TYPE_LABEL[k] || k, (k) => typeColor(k));
+  bars('byStatus', [...count((a) => a.status || 'Unknown')].sort((a, b) => b[1] - a[1]).slice(0, 8), (k) => k, (k) => CLOSED.has(k) ? css('--closed') : css('--open'));
+  years(count((a) => (a.submitted || '').slice(0, 4)));
+  meetings(inside);
+  renderList(true);
+}
+
+function bars(id, entries, label, color) {
+  const max = Math.max(1, ...entries.map((e) => e[1]));
+  $(id).innerHTML = entries.length ? entries.map(([k, n]) => `
+    <div class="bar"><span class="lbl" title="${esc(label(k))}">${esc(label(k))}</span>
+    <span class="track"><span class="fill" style="display:block;width:${(n / max) * 100}%;background:${color(k)}"></span></span>
+    <span class="n">${fmt.format(n)}</span></div>`).join('') : '<div class="empty" style="padding:4px 0;text-align:left">None</div>';
+}
+
+function years(m) {
+  const now = new Date().getFullYear();
+  const start = Math.min(now - 9, ...[...m.keys()].filter(Boolean).map(Number));
+  const ys = []; for (let y = start; y <= now; y++) ys.push(y);
+  const max = Math.max(1, ...ys.map((y) => m.get(String(y)) || 0));
+  $('byYear').innerHTML = ys.map((y) => { const n = m.get(String(y)) || 0; return `<div title="${y}: ${n}" style="height:${(n / max) * 100}%"></div>`; }).join('');
+  $('byYearAxis').innerHTML = `<span>${start}</span><span>${now}</span>`;
+}
+
+function meetings(inside) {
+  const today = new Date().toISOString().slice(0, 10);
+  const up = inside.filter((a) => a.meeting && a.meeting.date >= today).sort((a, b) => a.meeting.date.localeCompare(b.meeting.date));
+  $('meetingsSec').hidden = !up.length;
+  $('meetings').innerHTML = up.slice(0, 6).map((a) => `
+    <div class="card" data-id="${esc(a.id)}"><div class="top"><span class="badge">${esc(fmtDate(a.meeting.date))}${a.meeting.time ? ' · ' + esc(a.meeting.time) : ''}</span></div>
+    <div class="addr">${esc(a.addrs[0] || a.id)}</div><div class="desc">${esc(a.meeting.place || '')}</div></div>`).join('');
+}
+
+function cardHtml(a) {
+  const open = !CLOSED.has(a.status);
+  const extra = a.addrs.length > 1 ? ` <span style="color:var(--muted);font-weight:400">+${a.addrs.length - 1} more</span>` : '';
+  return `<div class="card${a.id === selectedId ? ' sel' : ''}" data-id="${esc(a.id)}">
+    <div class="top"><span class="badge"><span class="dot" style="background:${typeColor(a.type)}"></span>${esc(TYPE_LABEL[a.type] || a.type)}</span>
+      <span class="pill ${open ? 'open' : ''}">${esc(a.status || 'Unknown')}</span><span>${fmtDist(a._dist)}</span></div>
+    <div class="addr">${esc(a.addrs[0] || 'No address')}${extra}</div>
+    <div class="desc">${esc(a.desc || 'No description provided.')}</div>
+    <div class="meta"><span>Submitted ${esc(fmtDate(a.submitted))}</span>${a.units ? `<span>${fmt.format(a.units)} units</span>` : ''}${a.storeys ? `<span>${a.storeys} storeys</span>` : ''}
+      <span>Ward ${esc(a.ward)} ${esc(a.wardName)}</span>${a.url ? `<a href="${esc(a.url)}" target="_blank" rel="noopener">City file ↗</a>` : ''}</div>
+    ${a.id === selectedId ? detailHtml(a) : ''}
+  </div>`;
+}
+
+function detailHtml(a) {
+  const rows = [['File', a.id]];
+  if (a.parent) rows.push(['Parent file', a.parent]);
+  if (a.addrs.length > 1) rows.push(['Addresses', a.addrs.join('; ')]);
+  if (a.meeting) rows.push(['Community meeting', [fmtDate(a.meeting.date), a.meeting.time, a.meeting.place].filter(Boolean).join(' · ')]);
+  if (a.contact) rows.push(['City planner', [a.contact.name, a.contact.phone, a.contact.email].filter(Boolean).join(' · ')]);
+  return `<div class="meta" style="display:grid;gap:3px;margin-top:8px;user-select:text">${rows.map(([k, v]) => `<div><span style="color:var(--muted)">${esc(k)}:</span> ${esc(v)}</div>`).join('')}</div>`;
+}
+
+function popupHtml(a) {
+  return `<div class="pop"><div style="color:${typeColor(a.type)};font-weight:600;font-size:12px">${esc(TYPE_LABEL[a.type] || a.type)} · ${esc(a.status)}</div>
+    <div class="pop-addr">${esc(a.addrs[0] || a.id)}</div>
+    <div style="margin:4px 0;color:var(--muted)">${esc((a.desc || '').slice(0, 220))}${a.desc.length > 220 ? '…' : ''}</div>
+    <div>Submitted ${esc(fmtDate(a.submitted))}${a.url ? ` · <a href="${esc(a.url)}" target="_blank" rel="noopener">City file ↗</a>` : ''}</div></div>`;
+}
+
+function renderList(reset) {
+  if (reset) shown = 50;
+  const el = $('list');
+  if (!current.length) { el.innerHTML = '<div class="empty">No applications match in this radius. Try widening it or relaxing the filters.</div>'; return; }
+  el.innerHTML = current.slice(0, shown).map(cardHtml).join('') +
+    (current.length > shown ? `<button class="btn more" id="more">Show more (${fmt.format(current.length - shown)} left)</button>` : '');
+}
+
+function selectApp(a, fromBg) {
+  if (fromBg) { setCentre(a._pt[0], a._pt[1], true); selectedId = a.id; }
+  else selectedId = selectedId === a.id ? null : a.id;
+  const idx = current.findIndex((x) => x.id === a.id);
+  if (idx >= shown) shown = idx + 1;
+  renderList(false);
+  const card = document.querySelector(`#list .card[data-id="${CSS.escape(a.id)}"]`);
+  if (card) card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'more') { shown += 50; renderList(false); return; }
+  const card = e.target.closest('.card');
+  if (!card || e.target.closest('a')) return;
+  const a = APPS.find((x) => x.id === card.dataset.id);
+  if (!a) return;
+  selectedId = card.closest('#meetings') ? a.id : (selectedId === a.id ? null : a.id);
+  renderList(false);
+  const m = markerById.get(a.id);
+  if (m) { map.panTo(m.getLatLng()); m.openPopup(); }
+});
+
+// ---------- Controls ----------
+function setCentre(lat, lon, fly) {
+  state.lat = lat; state.lon = lon;
+  if (fly) map.flyTo([lat, lon], Math.max(map.getZoom(), zoomForRadius()), { duration: 0.6 });
+  render();
+}
+const zoomForRadius = () => state.r <= 400 ? 16 : state.r <= 900 ? 15 : state.r <= 2000 ? 14 : 13;
+
+let rTimer;
+$('radius').value = state.r;
+$('radius').addEventListener('input', (e) => {
+  state.r = +e.target.value;
+  circle.setRadius(state.r);
+  $('radiusVal').textContent = fmtRadius(state.r);
+  clearTimeout(rTimer); rTimer = setTimeout(render, 120);
+});
+$('radius').addEventListener('change', () => map.fitBounds(circle.getBounds(), { padding: [20, 20] }));
+
+for (const b of $('statusSeg').querySelectorAll('button')) {
+  b.setAttribute('aria-pressed', b.dataset.v === state.status);
+  b.addEventListener('click', () => {
+    state.status = b.dataset.v;
+    for (const x of $('statusSeg').querySelectorAll('button')) x.setAttribute('aria-pressed', x === b);
+    render();
+  });
+}
+
+$('typeChips').innerHTML = Object.entries(TYPE_LABEL).map(([k, v]) => `
+  <label class="chip"><input type="checkbox" id="type-${k}" value="${k}" ${state.types.has(k) ? 'checked' : ''}><span class="dot" style="background:${typeColor(k)}"></span>${v}</label>`).join('');
+$('typeChips').addEventListener('change', (e) => {
+  if (e.target.checked) state.types.add(e.target.value); else state.types.delete(e.target.value);
+  render();
+});
+
+(function sinceOptions() {
+  const now = new Date().getFullYear();
+  const opts = [['', 'Any time'], [`${now}-01-01`, `This year (${now})`]];
+  for (const n of [1, 2, 3, 5, 10]) opts.push([`${now - n}-01-01`, `Since ${now - n}`]);
+  $('since').innerHTML = opts.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+  if (!opts.some((o) => o[0] === state.since)) state.since = '';
+  $('since').value = state.since;
+})();
+$('since').addEventListener('change', (e) => { state.since = e.target.value; render(); });
+
+let kwTimer;
+$('kw').value = state.kw;
+$('kw').addEventListener('input', (e) => { clearTimeout(kwTimer); kwTimer = setTimeout(() => { state.kw = e.target.value.trim(); render(); }, 250); });
+
+$('sort').value = state.sort;
+$('sort').addEventListener('change', (e) => { state.sort = e.target.value; current = sortList(current); saveState(); renderList(true); });
+
+// ---------- Place search (offline: City centreline, application addresses, wards) ----------
+function extraPlaces(q) {
+  const out = [], nq = TDRStreets.norm(q);
+  if (WARDS) {
+    const wm = nq.match(/^ward (\d{1,2})$/);
+    for (const w of WARDS) {
+      if ((wm && +w.code === +wm[1]) || (nq.length >= 4 && TDRStreets.norm(w.name).includes(nq)))
+        out.push({ name: `Ward ${+w.code} ${w.name}`, lat: w.c[0], lon: w.c[1], kind: 'Ward', r: 2500 });
+    }
+  }
+  if (nq.length >= 4) {
+    let n = 0;
+    for (const a of APPS) {
+      const hit = a.addrs.findIndex((s) => TDRStreets.norm(s) === nq);
+      if (hit >= 0 && a.pts.length) { out.unshift({ name: a.addrs[hit], lat: a.pts[0][0], lon: a.pts[0][1], kind: 'Application site' }); if (++n >= 1) break; }
+    }
+  }
+  return out;
+}
+let qTimer, hits = [];
+$('q').addEventListener('input', (e) => {
+  clearTimeout(qTimer);
+  const q = e.target.value.trim();
+  if (q.length < 3) { $('suggest').hidden = true; return; }
+  qTimer = setTimeout(() => suggest(q), 200);
+});
+$('q').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); clearTimeout(qTimer); suggest(e.target.value.trim()); if (hits[0]) choose(hits[0]); }
+  if (e.key === 'Escape') $('suggest').hidden = true;
+});
+function suggest(q) {
+  if (!NET) { $('suggest').innerHTML = '<div style="padding:8px 12px;color:var(--muted);font-size:13px">Street data is still loading…</div>'; $('suggest').hidden = false; return; }
+  const seen = new Set();
+  hits = TDRStreets.geocode(NET, q, extraPlaces).filter((h) => { const k = h.name.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  $('suggest').innerHTML = hits.length
+    ? hits.map((h, i) => `<button data-i="${i}">${esc(h.name)}<span class="kind">${esc(h.kind)}</span></button>`).join('')
+    : '<div style="padding:8px 12px;color:var(--muted);font-size:13px">No match. Try a street address (2180 Yonge St) or two cross streets (Queen &amp; Spadina).</div>';
+  $('suggest').hidden = false;
+}
+$('suggest').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (b) choose(hits[+b.dataset.i]); });
+function choose(h) {
+  $('suggest').hidden = true;
+  $('q').value = h.name;
+  if (h.r) { state.r = h.r; $('radius').value = h.r; }
+  setCentre(h.lat, h.lon, true);
+}
+document.addEventListener('click', (e) => { if (!e.target.closest('.search')) $('suggest').hidden = true; });
+
+// ---------- CSV (claude.ai save prompt when available, a normal download otherwise) ----------
+let downloads = null;
+$('csv').hidden = false;
+(async () => {
+  try { downloads = window.claude ? await window.claude.use('downloads') : null; } catch { downloads = null; }
+})();
+$('csv').addEventListener('click', async () => {
+  const cols = ['application', 'type', 'status', 'submitted', 'distance_m', 'address', 'all_addresses', 'units', 'storeys', 'ward', 'lat', 'lon', 'description', 'url'];
+  const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const lines = [cols.join(',')].concat(current.map((a) => [a.id, TYPE_LABEL[a.type] || a.type, a.status, a.submitted, Math.round(a._dist), a.addrs[0], a.addrs.join('; '),
+    a.units, a.storeys, `${a.ward} ${a.wardName}`, a._pt?.[0], a._pt?.[1], a.desc, a.url].map(q).join(',')));
+  const btn = $('csv');
+  const filename = `toronto-dev-applications-${state.r}m.csv`;
+  if (!downloads) {
+    const url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return;
+  }
+  try {
+    await downloads.save({ filename: `toronto-dev-applications-${state.r}m.csv`, data: new Blob([lines.join('\n')], { type: 'text/csv' }) });
+    btn.textContent = 'Saved';
+  } catch (err) {
+    btn.textContent = err && err.code === 'declined' ? 'Save CSV' : 'Could not save';
+    if (err && (err.code === 'unavailable' || err.code === 'not_granted')) btn.hidden = true;
+  }
+  setTimeout(() => { btn.textContent = 'Save CSV'; }, 2500);
+});
+
+// ---------- Boot ----------
+(async function boot() {
+  render();
+  map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+  const streetsP = fetch('streets.json').then((r) => r.json()).then((j) => { NET = TDRStreets.decode(j); });
+  const wardsP = fetch('wards.json').then((r) => r.json()).then((j) => {
+    WARDS = j.wards.map((w) => {
+      const rings = w.rings.map((r) => { const out = []; let x = 0, y = 0; for (let i = 0; i < r.length; i += 2) { x += r[i]; y += r[i + 1]; out.push([x / j.q, y / j.q]); } return out; });
+      let sx = 0, sy = 0, n = 0; for (const p of rings[0]) { sx += p[0]; sy += p[1]; n++; }
+      return { code: w.code, name: w.name, rings, c: [sy / n, sx / n] };
+    });
+  }).catch(() => {});
+  try {
+    const res = await fetch('applications.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { meta, cols, rows } = await res.json();
+    APPS = rows.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])));
+    $('freshness').textContent = `${fmt.format(meta.applications)} applications across the city`;
+    $('snap').textContent = `Snapshot of City data updated ${fmtDate((meta.sourceUpdated || '').slice(0, 10))}`;
+    $('snap').hidden = false;
+    render();
+  } catch (e) {
+    $('freshness').textContent = 'Could not load the applications.';
+    document.querySelector('aside header').insertAdjacentHTML('afterend', `<div class="err">The application data did not load (${esc(e.message)}). Reload the page to try again.</div>`);
+    $('list').innerHTML = '';
+  }
+  await Promise.allSettled([streetsP, wardsP]);
+  basemap.redraw();
+})();
+</script>
+<script src="feasibility.js"></script>
+</body>
+</html>
