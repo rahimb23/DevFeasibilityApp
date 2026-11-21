@@ -13,7 +13,7 @@
   --accent: #1f5fbf; --accent-ink: #ffffff; --ring: rgba(31,95,191,.25);
   --c-OZ: #2a6fd6; --c-SA: #d9682a; --c-CD: #2a9467; --c-SB: #8a56d1; --c-PL: #c9416b;
   --open: #2a9467; --closed: #8d8f94;
-  --land: #ecebe6; --road: #ffffff; --casing: #d3d1c9; --hwy: #f4d79a; --hwy-casing: #d8b468; --water: #9cc3e0; --water-fill: #cfe1ee; --rail: #b3b1aa; --trail: #a9c79a; --label: #55565a; --halo: #ecebe6; --ward: #8a8da0; --parcel: rgba(70,72,80,.45); --pos: #2a9467; --neg: #c9416b;
+  --land: #ecebe6; --road: #ffffff; --casing: #d3d1c9; --hwy: #f4d79a; --hwy-casing: #d8b468; --water: #9cc3e0; --water-fill: #cfe1ee; --rail: #b3b1aa; --trail: #a9c79a; --label: #55565a; --halo: #ecebe6; --ward: #8a8da0; --parcel: rgba(70,72,80,.45); --pos: #2a9467; --neg: #c9416b; --ov-bylaw: #e0a800; --ov-flood: #1f6fd1; --ov-trca: #0f8a8a; --ov-ravine: #2f8f3a; --ov-nhs: #7a9a2a; --ov-esa: #8a4fc4;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -22,7 +22,7 @@
     --accent: #6ea2f2; --accent-ink: #0d1420; --ring: rgba(110,162,242,.3);
     --c-OZ: #5d97f0; --c-SA: #ee8a52; --c-CD: #4bb98a; --c-SB: #a982ea; --c-PL: #e66a90;
     --open: #4bb98a; --closed: #77797e;
-    --land: #1e2024; --road: #34373d; --casing: #2a2c31; --hwy: #6b5a35; --hwy-casing: #4d4128; --water: #3d5f7c; --water-fill: #1b2a38; --rail: #4a4c52; --trail: #34503a; --label: #b4b6bb; --halo: #1e2024; --ward: #6c7086; --parcel: rgba(200,204,215,.35); --pos: #3fae7f; --neg: #e0607f;
+    --land: #1e2024; --road: #34373d; --casing: #2a2c31; --hwy: #6b5a35; --hwy-casing: #4d4128; --water: #3d5f7c; --water-fill: #1b2a38; --rail: #4a4c52; --trail: #34503a; --label: #b4b6bb; --halo: #1e2024; --ward: #6c7086; --parcel: rgba(200,204,215,.35); --pos: #3fae7f; --neg: #e0607f; --ov-bylaw: #ffd23f; --ov-flood: #5aa2ff; --ov-trca: #3cc6c6; --ov-ravine: #58c46a; --ov-nhs: #a9c95a; --ov-esa: #b88bf0;
     color-scheme: dark;
   }
 }
@@ -31,7 +31,7 @@
   --accent: #6ea2f2; --accent-ink: #0d1420; --ring: rgba(110,162,242,.3);
   --c-OZ: #5d97f0; --c-SA: #ee8a52; --c-CD: #4bb98a; --c-SB: #a982ea; --c-PL: #e66a90;
   --open: #4bb98a; --closed: #77797e;
-  --land: #1e2024; --road: #34373d; --casing: #2a2c31; --hwy: #6b5a35; --hwy-casing: #4d4128; --water: #3d5f7c; --water-fill: #1b2a38; --rail: #4a4c52; --trail: #34503a; --label: #b4b6bb; --halo: #1e2024; --ward: #6c7086; --parcel: rgba(200,204,215,.35); --pos: #3fae7f; --neg: #e0607f;
+  --land: #1e2024; --road: #34373d; --casing: #2a2c31; --hwy: #6b5a35; --hwy-casing: #4d4128; --water: #3d5f7c; --water-fill: #1b2a38; --rail: #4a4c52; --trail: #34503a; --label: #b4b6bb; --halo: #1e2024; --ward: #6c7086; --parcel: rgba(200,204,215,.35); --pos: #3fae7f; --neg: #e0607f; --ov-bylaw: #ffd23f; --ov-flood: #5aa2ff; --ov-trca: #3cc6c6; --ov-ravine: #58c46a; --ov-nhs: #a9c95a; --ov-esa: #b88bf0;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -111,6 +111,23 @@ footer a { color: inherit; }
 .pop-addr { font-weight: 600; }
 .pop a { color: var(--accent); }
 .center-pin { width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.4); }
+.layers-ctl { background: var(--panel); color: var(--ink); border-radius: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.25); font-size: 12px; max-width: 270px; }
+.layers-toggle { display: block; width: 100%; border: 0; background: none; padding: 8px 12px; font-weight: 650; text-align: left; cursor: pointer; color: var(--ink); }
+.layers-toggle::after { content: " ▾"; color: var(--muted); }
+.layers-toggle[aria-expanded="true"]::after { content: " ▴"; }
+.layers-body { padding: 0 12px 10px; display: grid; gap: 6px; }
+.layer-row { display: grid; grid-template-columns: auto 22px 1fr; gap: 8px; align-items: center; cursor: pointer; line-height: 1.3; }
+.layer-row small { display: block; color: var(--muted); font-size: 11px; }
+.sw { width: 20px; height: 14px; border-radius: 3px; box-sizing: border-box; }
+.sw-bylaw { border: 2.5px solid var(--ov-bylaw); background: color-mix(in srgb, var(--ov-bylaw) 10%, transparent); }
+.sw-flood { border: 1px solid var(--ov-flood); background: color-mix(in srgb, var(--ov-flood) 40%, transparent); }
+.sw-trca { border: 1.5px dashed var(--ov-trca); background: color-mix(in srgb, var(--ov-trca) 10%, transparent); }
+.sw-ravine { border: 1px solid var(--ov-ravine); background: color-mix(in srgb, var(--ov-ravine) 25%, transparent); }
+.sw-nhs { border: 1px solid var(--ov-nhs); background: color-mix(in srgb, var(--ov-nhs) 22%, transparent); }
+.sw-esa { border: 1.5px solid var(--ov-esa); background: color-mix(in srgb, var(--ov-esa) 28%, transparent); }
+.layers-src { color: var(--muted); font-size: 10.5px; line-height: 1.35; border-top: 1px solid var(--line); padding-top: 6px; }
+.flag.bylaw { color: color-mix(in srgb, var(--ov-bylaw) 70%, var(--ink)); background: color-mix(in srgb, var(--ov-bylaw) 18%, transparent); }
+.flag.water { color: var(--ov-flood); background: color-mix(in srgb, var(--ov-flood) 12%, transparent); }
 .legend { background: var(--panel); color: var(--ink); padding: 8px 10px; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,.2); font-size: 12px; line-height: 1.7; }
 .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
 .err { background: var(--soft); color: var(--ink); border-left: 3px solid #c9416b; padding: 10px 12px; border-radius: 8px; margin: 10px 20px; font-size: 13px; }
@@ -872,5 +889,6 @@ $('csv').addEventListener('click', async () => {
 })();
 </script>
 <script src="feasibility.js"></script>
+<script src="layers.js"></script>
 </body>
 </html>

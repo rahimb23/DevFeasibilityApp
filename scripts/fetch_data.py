@@ -4,7 +4,7 @@ Each resource is looked up by package and resource name through the CKAN API, so
 script keeps working when the City replaces a file (its download URL changes).
 Usage: python3 scripts/fetch_data.py [out-dir]
 """
-import json, os, sys, urllib.request, zipfile, shutil
+import json, os, sys, urllib.parse, urllib.request, zipfile, shutil
 
 CKAN = 'https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action'
 OUT = sys.argv[1] if len(sys.argv) > 1 else 'data/raw'
@@ -23,6 +23,8 @@ WANTED = [
     ('address-points-municipal-toronto-one-address-repository', lambda n: n == 'Address Points - 4326.csv', 'addr.csv', False),
     ('minister-approved-major-transit-station-areas', lambda n: 'delineation' in n.lower(), 'mtsa', True),
     ('heritage-register', lambda n: n == 'Heritage Register Data', 'heritage', True),
+    ('environmentally-significant-areas', lambda n: n == 'Environmentally Significant Areas - 4326.geojson', 'esa.geojson', False),
+    ('natural-heritage-system', lambda n: n == 'natural-heritage-area-wgs84', 'nhs', True),
     ('ravine-natural-feature-protection-area', lambda n: 'wgs84' in n.lower(), 'ravine', True),
     # newest WGS84 3D massing shapefile (names look like 3DMassingShapefile_2025_WGS84.zip)
     ('3d-massing', 'massing', 'massing', True),
@@ -62,4 +64,26 @@ for pkg, match, name, unzip in WANTED:
         with zipfile.ZipFile(dest) as z:
             z.extractall(folder)
         os.remove(dest)
+# TRCA flood and regulation mapping (ArcGIS feature services, TRCA Open Data Licence v1.0),
+# limited to a box around Toronto and paged through the service's record limit.
+TRCA = 'https://services1.arcgis.com/d0ZCwU7eGKVeNiEE/arcgis/rest/services'
+TORONTO_BOX = '-79.66,43.57,-79.10,43.87'
+def arcgis_geojson(layer_url, dest):
+    feats, offset = [], 0
+    while True:
+        q = urllib.parse.urlencode({'where': '1=1', 'outFields': '*', 'outSR': 4326, 'f': 'geojson',
+                                    'geometry': TORONTO_BOX, 'geometryType': 'esriGeometryEnvelope', 'inSR': 4326,
+                                    'spatialRel': 'esriSpatialRelIntersects', 'resultOffset': offset, 'resultRecordCount': 1000})
+        with urllib.request.urlopen(f'{layer_url}/query?{q}', timeout=300) as r:
+            page = json.load(r)
+        got = page.get('features', [])
+        feats += got
+        if len(got) < 1000: break
+        offset += len(got)
+    json.dump({'type': 'FeatureCollection', 'features': feats}, open(dest, 'w'))
+    return len(feats)
+
+for name, url in [('trca_regulated.geojson', f'{TRCA}/TRCA_Regulation_Limit2/FeatureServer/0'),
+                  ('floodplain.geojson', f'{TRCA}/Floodline_TRCA_Polygon/FeatureServer/1')]:
+    print(f'TRCA: {name}', arcgis_geojson(url, os.path.join(OUT, name)), 'features', flush=True)
 print('done')

@@ -153,6 +153,61 @@ if os.path.exists(f'{src}/formermun.geojson'):
     fmi = point_join(fg)
     fm_names = [p['AREA_NAME'] for p in fp]
 
+print('flood and environmental overlap…', flush=True)
+def subdivide(geoms, cell=0.005):
+    """Split large polygons into grid-cell pieces so overlap tests stay fast."""
+    parts = shapely.get_parts(shapely.make_valid(np.asarray(geoms, dtype=object)))
+    parts = parts[np.isin(shapely.get_type_id(parts), [3, 6])]
+    out_parts = []
+    for g in parts:
+        x0, y0, x1, y1 = g.bounds
+        if x1 - x0 <= cell and y1 - y0 <= cell:
+            out_parts.append(g); continue
+        boxes = [shapely.box(x, y, x + cell, y + cell) for x in np.arange(x0, x1, cell) for y in np.arange(y0, y1, cell)]
+        pieces = shapely.intersection(g, np.asarray(boxes, dtype=object))
+        out_parts += [q for q in pieces if not q.is_empty]
+    return np.asarray(out_parts, dtype=object)
+
+def overlap_flags(geoms, min_m2=10, min_share=0.02):
+    """Parcels overlapping the layer by at least min_m2 or min_share of the parcel's area."""
+    geoms = subdivide(geoms)
+    t = shapely.STRtree(geoms)
+    a, b = t.query(pg, predicate='intersects')
+    flag = np.zeros(N, dtype=bool)
+    if len(a):
+        inter = shapely.area(to_m(shapely.intersection(pg[a], geoms[b])))
+        tot = np.bincount(a, weights=inter, minlength=N)  # a parcel can meet several pieces
+        flag = (tot >= min_m2) | (tot >= min_share * area)
+    return flag
+ENV_LAYERS = [(1, 'floodplain.geojson'), (2, 'trca_regulated.geojson'), (4, 'esa.geojson'), (8, 'nhs')]
+env = np.zeros(N, dtype=np.int64)
+for bit, name in ENV_LAYERS:
+    path = f'{src}/{name}'
+    if not os.path.exists(path): continue
+    geoms = load_shp(find_shp(name))[0] if os.path.isdir(path) else load_geojson(name)[0]
+    f = overlap_flags(geoms)
+    env[f] |= bit
+    print(f'  {name}: {int(f.sum())} parcels', flush=True)
+
+print('former by-law areas…', flush=True)
+os.makedirs(f'{out}/layers', exist_ok=True)
+def enc_ring(coords, q=100_000):
+    c = np.round(np.asarray(coords)[:-1, :2] * q).astype(np.int64)
+    return np.vstack([c[:1], np.diff(c, axis=0)]).ravel().tolist() if len(c) >= 3 else None
+fb = []
+for k in sorted(set(int(v) for v in fmi[zcol < 0])):
+    sel = np.where((zcol < 0) & (fmi == k))[0]
+    # a 0.5 m buffer in and out closes slivers between neighbouring parcels
+    u = shapely.union_all(shapely.buffer(pg[sel], 0.000005, quad_segs=2)).buffer(-0.000005, quad_segs=2)
+    u = shapely.simplify(u, 0.00001, preserve_topology=True)
+    for poly in (u.geoms if u.geom_type == 'MultiPolygon' else [u]):
+        if poly.geom_type != 'Polygon' or poly.is_empty: continue
+        rings = [r for r in [enc_ring(poly.exterior.coords)] + [enc_ring(i.coords) for i in poly.interiors] if r]
+        if rings: fb.append({'p': {'m': fm_names[k] if k >= 0 else None}, 'r': rings})
+with open(f'{out}/layers/former-bylaw.json', 'w') as fh:
+    fh.write('{"q":100000,"features":[\n' + ',\n'.join(json.dumps(f, separators=(',', ':')) for f in fb) + '\n]}')
+print(f'  {len(fb)} areas', flush=True)
+
 print('heritage…', flush=True)
 hrg, hrp = load_shp(find_shp('heritage'))
 tree = shapely.STRtree(pg)
@@ -218,18 +273,19 @@ for i in range(N):
         h['HT_LABEL'] if h and (h['HT_LABEL'] or -1) > 0 else None, h['HT_STORIES'] if h and (h['HT_STORIES'] or -1) > 0 else None,
         cp[ci[i]]['PRCNT_CVER'] if ci[i] >= 0 else None, int(si[i]), sorted(set(int(k) for k in asj.get(i, []))), int(mi[i]),
         1 if i in rv else 0, heritage.get(i), round(float(bfp[i])), round(float(bmax[i]), 1), round(float(bgfa[i])), int(bcount[i]),
-        sorted(addrs.get(i, []), key=addr_sort)[:3], int(fmi[i]), round(x, 6), round(y, 6), d,
+        sorted(addrs.get(i, []), key=addr_sort)[:3], int(fmi[i]), int(env[i]), round(x, 6), round(y, 6), d,
     ]
     tiles[tk].append(row)
 
 cols = ['id', 'kind', 'areaM2', 'widthM', 'depthM', 'zone', 'heightM', 'heightStoreys', 'coveragePct', 'secondaryPlan', 'sasp', 'mtsa',
-        'ravine', 'heritage', 'bldgFootprintM2', 'bldgMaxHeightM', 'bldgGfaEstM2', 'bldgCount', 'addresses', 'formerMun', 'lon', 'lat', 'ring']
+        'ravine', 'heritage', 'bldgFootprintM2', 'bldgMaxHeightM', 'bldgGfaEstM2', 'bldgCount', 'addresses', 'formerMun', 'env', 'lon', 'lat', 'ring']
 index = {}
 for (tx, ty), rows in tiles.items():
     name = f'{tx}_{ty}'
     with open(f'{out}/parcels/{name}.json', 'w') as fh:
         fh.write('{"q":%d,"rows":[\n' % QP + ',\n'.join(json.dumps(r, separators=(',', ':')) for r in rows) + '\n]}')
     index[name] = len(rows)
-lookups.update({'cols': cols, 'tile': TILE, 'tiles': index, 'formerMunicipalities': fm_names})
+lookups.update({'cols': cols, 'tile': TILE, 'tiles': index, 'formerMunicipalities': fm_names,
+                'envBits': {'1': 'floodplain', '2': 'trcaRegulated', '4': 'esa', '8': 'nhs'}})
 json.dump(lookups, open(f'{out}/parcel-index.json', 'w'), separators=(',', ':'))
 print('done:', N, 'parcels in', len(index), 'tiles;', len(zones), 'zone strings', flush=True)

@@ -10,7 +10,17 @@ A map of City of Toronto development applications with a site feasibility tool.
   - density on nearby approved and proposed projects
   - a residual land value pro forma, with assumptions you can edit and a price/cost sensitivity grid
 
-All data comes from [City of Toronto Open Data](https://open.toronto.ca/) (Open Government Licence – Toronto).
+- **Map layers** (switch on and off with the *Map layers* panel):
+  - former by-law areas, outlined in yellow
+  - TRCA regulatory floodplain
+  - TRCA regulated area
+  - ravine and natural feature protection
+  - Natural Heritage System
+  - Environmentally Significant Areas
+
+  The site panel flags any parcel that overlaps one of them.
+
+Flood and regulation mapping comes from [TRCA Open Data](https://trca-camaps.opendata.arcgis.com/) (TRCA Open Data Licence v1.0). Everything else comes from [City of Toronto Open Data](https://open.toronto.ca/) (Open Government Licence – Toronto).
 
 ## How it's hosted
 
@@ -28,6 +38,7 @@ One-time setup: in the repo, open **Settings → Pages** and set **Source** to *
 | `scripts/export_apps.js` | Pulls the development applications feed and groups it into one record per application |
 | `scripts/build_snapshot.py` | Writes `applications.json`, `streets.json` (basemap and geocoder) and `wards.json` |
 | `scripts/build_precedents.py` | Adds GFA, site area and FSI to each application |
+| `scripts/build_layers.py` | Writes the flood and environmental map layers to `layers/`, clipped to the city |
 | `scripts/build_parcels.py` | Joins every parcel to zoning, overlays, policies, heritage, ravines, 3D massing and addresses, then writes map tiles |
 | `server.js`, `public/` | Optional live Node server (radar only) that proxies the City feed |
 

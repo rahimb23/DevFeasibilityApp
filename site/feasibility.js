@@ -179,6 +179,7 @@ function siteFacts() {
   const zones = new Map(), sps = new Set(), sasp = new Set(), mtsa = new Map(), heritage = new Set(), addrs = [];
   let heightM = null, heightSt = null, cov = null, ravine = false, unzoned = false, condo = false, holding = false;
   const formerBylaws = new Set();
+  let env = 0;
   let bFoot = 0, bGfa = 0, bMax = 0, bCount = 0;
   for (const p of P) {
     const z = zoneOf(p);
@@ -198,6 +199,7 @@ function siteFacts() {
     for (const s of p.sasp) sasp.add(LOOK().sasp[s]);
     if (p.mtsa >= 0) mtsa.set(p.mtsa, LOOK().mtsa[p.mtsa]);
     if (p.ravine) ravine = true;
+    env |= p.env || 0;
     if (p.heritage) heritage.add(p.heritage);
     if (p.kind === 'C') condo = true;
     addrs.push(...p.addresses);
@@ -205,7 +207,7 @@ function siteFacts() {
   }
   let lat = 0, lon = 0; for (const p of P) { lat += p.lat; lon += p.lon; } lat /= P.length; lon /= P.length;
   return { area, zonedFsi: fsiArea ? fsiW / fsiArea : null, zonedFsiShare: area ? fsiArea / area : 0, zones: [...zones.values()], heightM, heightSt, cov,
-    sps: [...sps], sasp: [...sasp].sort(), mtsa: [...mtsa.values()], ravine, heritage: [...heritage], unzoned, formerBylaws: [...formerBylaws], condo, holding, addrs,
+    sps: [...sps], sasp: [...sasp].sort(), mtsa: [...mtsa.values()], ravine, env, heritage: [...heritage], unzoned, formerBylaws: [...formerBylaws], condo, holding, addrs,
     bFoot, bGfa, bMax, bCount, lat, lon, width: P.length === 1 ? P[0].widthM : null, depth: P.length === 1 ? P[0].depthM : null };
 }
 function precedents(f) {
@@ -291,7 +293,12 @@ function renderSite() {
   const flags = [];
   if (f.condo) flags.push('<span class="flag warn">Registered condominium: needs the condo corporation to sell</span>');
   if (f.heritage.length) flags.push(`<span class="flag warn">Heritage: ${esc(f.heritage.map((h) => h === 'Part IV' ? 'Designated (Part IV)' : h === 'Part V' ? 'Heritage Conservation District (Part V)' : 'Listed').join(', '))}</span>`);
+  if (f.env & 1) flags.push('<span class="flag water">In the TRCA regulatory floodplain</span>');
+  if (f.env & 2) flags.push('<span class="flag warn">TRCA regulated area: permit needed</span>');
   if (f.ravine) flags.push('<span class="flag warn">Ravine and natural feature protection area</span>');
+  if (f.env & 4) flags.push('<span class="flag warn">Environmentally Significant Area</span>');
+  if (f.env & 8) flags.push('<span class="flag">Natural Heritage System</span>');
+  if (f.unzoned) flags.push('<span class="flag bylaw">Former by-law area</span>');
   if (f.holding) flags.push('<span class="flag warn">Holding (H) symbol on the zoning</span>');
   if (f.mtsa.length) flags.push(`<span class="flag good">${esc(f.mtsa[0][0])} station area (${esc(f.mtsa[0][1].replace(' Major Transit Station Area', ' MTSA'))})</span>`);
   $('siteFlags').innerHTML = flags.join('') || '<span class="flag">No heritage, ravine or condominium flags</span>';
@@ -314,6 +321,15 @@ function renderSite() {
     fact('Lot coverage', f.cov ? `${num(f.cov)}%` : '—'),
     fact('Secondary Plan', f.sps.length ? esc(f.sps.join(', ')) : 'None'),
     fact('Site and Area Specific Policy', f.sasp.length ? esc(f.sasp.map((s) => 'SASP ' + +s).join(', ')) : 'None'),
+    fact('Flood and natural features', (() => {
+      const items = [];
+      if (f.env & 1) items.push('Regulatory floodplain (TRCA)');
+      if (f.env & 2) items.push('TRCA regulated area');
+      if (f.ravine) items.push('Ravine and natural feature protection');
+      if (f.env & 4) items.push('Environmentally Significant Area');
+      if (f.env & 8) items.push('Natural Heritage System');
+      return items.length ? items.map(esc).join('<br>') : 'None mapped';
+    })(), (f.env & 3) ? 'Development here needs a TRCA permit under Ontario Regulation 41/24, and floodplain lands may be limited or unbuildable. Confirm the limits with TRCA.' : (f.env & 12) || f.ravine ? 'Official Plan natural heritage policies apply. Expect setbacks or an environmental study.' : ''),
     fact('Major Transit Station Area', f.mtsa.length ? esc(f.mtsa.map((m) => m[0]).join(', ')) : 'None', f.mtsa.length ? 'Official Plan minimum densities apply. Inclusionary zoning may apply in protected areas.' : ''),
   ].join('');
 
