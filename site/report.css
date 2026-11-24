@@ -1,5 +1,5 @@
 /* Feasibility report (single light theme on purpose: it is a printed document) */
-#report { --r-desk: #e4e6ea; --r-paper: #ffffff; --r-ink: #1b1d21; --r-muted: #5e6470; --r-rule: #d9dce2; --r-soft: #f3f4f7; --r-accent: #1f5fbf; --r-pos: #2a9467; --r-neg: #c9416b; --r-warn: #a8650f;
+#report { --r-desk: #e4e6ea; --r-paper: #ffffff; --r-ink: #1b1d21; --r-muted: #5e6470; --r-rule: #d9dce2; --r-soft: #f3f4f7; --r-accent: #05805a; --r-pos: #2a9467; --r-neg: #c9416b; --r-warn: #a8650f;
   --r-display: "IBM Plex Sans Condensed", "Arial Narrow", Arial, sans-serif; --r-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif; --r-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
   position: fixed; inset: 0; z-index: 3000; overflow-y: auto; background: var(--r-desk); color: var(--r-ink); font: 13.5px/1.5 var(--r-body); color-scheme: light; }
 body.report-open { overflow: hidden; }
