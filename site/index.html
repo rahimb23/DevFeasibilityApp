@@ -239,6 +239,18 @@ details.pf-details summary { cursor: pointer; font-weight: 600; font-size: 13px;
 .leaflet-control-attribution a { color: var(--muted) !important; }
 .leaflet-bar a { background: var(--panel); color: var(--ink); border-bottom-color: var(--line); }
 .leaflet-bar a:hover { background: var(--soft); }
+.mkt-h { font-size: 12px; font-weight: 650; margin: 14px 0 6px; }
+.mkt-wrap { overflow-x: auto; }
+.mkt th { text-align: left; color: var(--muted); font-weight: 500; font-size: 11.5px; padding: 4px 6px 4px 0; border-bottom: 1px solid var(--line); }
+.pf-table.mkt td { padding: 6px 6px 6px 0; text-align: left; width: auto; color: var(--ink); }
+.pf-table.mkt td:nth-child(3), .pf-table.mkt td:nth-child(4), .mkt th:nth-child(3), .mkt th:nth-child(4) { text-align: right; white-space: nowrap; }
+.mkt tr.sel td { background: color-mix(in srgb, var(--accent) 12%, transparent); font-weight: 650; }
+.pf-table.mkt { font-family: var(--f-body, inherit); font-size: 12px; }
+.pf-table.mkt td:first-child { min-width: 118px; }
+.mkt .pill { display: inline-block; margin-top: 3px; font-size: 10.5px; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font: inherit; text-decoration: underline; text-underline-offset: 2px; }
+#siteMarket .tiles { margin-top: 4px; }
+#siteMarket .hint { margin-top: 8px; }
 </style>
 <style>
 /* Green glass theme. Recolours the interface only; data colours (application types, overlays,
@@ -471,6 +483,10 @@ h2 { font: 600 10.5px/1.2 var(--f-mono); letter-spacing: .12em; color: var(--mut
           <div class="rlv" id="rlvBox"><div class="big" id="rlvTotal"></div><div class="note" id="rlvNote"></div><div class="rlv-stats" id="rlvStats"></div></div>
           <button class="btn primary" id="makeReport" style="width:100%;margin-top:10px">Create feasibility report</button>
           <div id="massing" style="margin-top:10px"></div>
+        </section>
+        <section>
+          <h2>Market area and ward</h2>
+          <div id="siteMarket"></div>
         </section>
         <section>
           <h2>Pro forma</h2>

@@ -20,6 +20,8 @@ A map of City of Toronto development applications with a site feasibility tool.
 
     The starting prices are estimates anchored to the 2026 citywide average for new condos (about $1,189/sf, reported by Toronto Life from Urbanation data). No free source breaks new-condo prices down by area, so replace them with your own comparables under *Assumptions*. Construction costs stay citywide.
 
+    The site panel's **Market area and ward** section shows the site's ward, its market area and the price used, with a link to edit that price. It also shows development activity in the ward (open applications, units proposed, median proposed height against the city median, and recent rezoning files) and a table of all four areas with their wards, open applications and prices. The report's *Assumptions* page repeats it.
+
 - **Opportunities:** every parcel gets a development opportunity score out of 100. It adds points for zoning (up to 25), transit station area (20), room to add density compared with nearby approvals (25), lot size (15), recent applications nearby (10) and a Secondary Plan (5), and takes points off for TRCA, ravine, natural heritage and heritage constraints.
   - Left out entirely: condos, designated heritage, floodplain land, parks, employment and institutional zones, and small lots.
   - Development applications located on a site are flagged in the list, on the map (green ring) and in the site panel, which lists every file on the site with links.

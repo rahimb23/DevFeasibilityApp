@@ -68,6 +68,75 @@ function marketArea(f) {
   return { ...hit.area, ward: hit.ward, price: PF[hit.area.key] };
 }
 const salePrice = (f) => marketArea(f).price;
+
+// ---------- Market area and ward summary ----------
+const PRICE_NOTE = 'Area prices are starting estimates anchored to the 2026 citywide average for new condos (about $1,189/sf). '
+  + 'No free source breaks new-condo prices down by area, so replace them with your own comparables.';
+const median = (xs) => { if (!xs.length) return null; const s = [...xs].sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+// Development activity from the applications snapshot. Units and storeys are read from file descriptions, so they are approximate.
+function activity(apps) {
+  const open = apps.filter((a) => !CLOSED.has(a.status));
+  const since = new Date().getFullYear() - 5;
+  return {
+    open: open.length,
+    units: open.reduce((s, a) => s + (a.units || 0), 0),
+    medStoreys: median(open.map((a) => a.storeys).filter((v) => v > 0)),
+    rezonings: apps.filter((a) => a.type === 'OZ' && (a.submitted || '') >= `${since}`).length,
+    since,
+  };
+}
+const ACT_CACHE = new Map();
+function wardActivity(code) {
+  if (!ACT_CACHE.has(code)) ACT_CACHE.set(code, activity(APPS.filter((a) => +a.ward === code)));
+  return ACT_CACHE.get(code);
+}
+function cityActivity() {
+  if (!ACT_CACHE.has('city')) ACT_CACHE.set('city', activity(APPS));
+  return ACT_CACHE.get('city');
+}
+function areaActivity(area) {
+  const k = 'area:' + area.key;
+  if (!ACT_CACHE.has(k)) ACT_CACHE.set(k, activity(APPS.filter((a) => area.wards.includes(+a.ward))));
+  return ACT_CACHE.get(k);
+}
+function wardNames(codes) {
+  if (typeof WARDS === 'undefined' || !WARDS) return codes.join(', ');
+  return codes.map((c) => { const w = WARDS.find((x) => +x.code === c); return w ? `${c} ${w.name}` : `${c}`; }).join(', ');
+}
+function renderMarket(f) {
+  const ma = marketArea(f), code = ma.ward ? +ma.ward.match(/\d+/)[0] : null;
+  const w = code ? wardActivity(code) : null, city = cityActivity();
+  const edited = PF[ma.key] !== DEFAULTS[ma.key];
+  const tile = (v, k) => `<div class="tile"><div class="v">${v}</div><div class="k">${k}</div></div>`;
+  $('siteMarket').innerHTML = `
+    ${fact('Ward', ma.ward ? esc(ma.ward) : 'Not found', ma.ward ? '' : 'Ward boundaries are still loading, so the Central and midtown price is used for now.')}
+    ${fact('Market area', esc(ma.label), 'The area sets the sale price used in the pro forma.')}
+    ${fact('Sale price used', `$${num(ma.price)}/sf${edited ? ' <span class="pill">edited</span>' : ''}`, `<button class="linkbtn" type="button" data-edit-price="${ma.key}">Change the ${esc(ma.label.toLowerCase())} price</button>`)}
+    ${w ? `<h3 class="mkt-h">Development activity in ward ${code}</h3>
+    <div class="tiles">
+      ${tile(num(w.open), 'open applications')}
+      ${tile(num(w.units), 'units proposed in open files')}
+      ${tile(w.medStoreys ? `${num(w.medStoreys)}` : '—', `median proposed storeys (city: ${city.medStoreys ? num(city.medStoreys) : '—'})`)}
+      ${tile(num(w.rezonings), `rezoning and OPA files since ${w.since}`)}
+    </div>
+    <div class="hint">From the City's development applications. Units and storeys are read from file descriptions, so treat them as approximate.</div>` : ''}
+    <h3 class="mkt-h">Market areas and prices</h3>
+    <div class="mkt-wrap"><table class="pf-table mkt">
+      <thead><tr><th>Area</th><th>Wards</th><th title="Open development applications">Open</th><th>Price</th></tr></thead>
+      <tbody>${MARKET_AREAS.map((a) => `<tr class="${a.key === ma.key ? 'sel' : ''}">
+        <td>${esc(a.label)}${a.key === ma.key ? '<br><span class="pill open">this site</span>' : ''}</td>
+        <td title="${esc(wardNames(a.wards))}">${a.wards.join(', ')}</td>
+        <td>${num(areaActivity(a).open)}</td>
+        <td>$${num(PF[a.key])}${PF[a.key] !== DEFAULTS[a.key] ? '*' : ''}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="hint">${esc(PRICE_NOTE)}${MARKET_AREAS.some((a) => PF[a.key] !== DEFAULTS[a.key]) ? ' * Edited in this browser.' : ''} Hover over a ward list to see the ward names.</div>`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-edit-price]'); if (!b) return;
+  const d = document.querySelector('details.pf-details'); if (d) d.open = true;
+  const inp = $('pf-' + b.dataset.editPrice);
+  if (inp) { inp.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(() => { inp.focus(); inp.select(); }, 350); }
+});
 let PF = { ...DEFAULTS };
 try { Object.assign(PF, JSON.parse(localStorage.getItem('tdr-proforma-v1') || '{}')); } catch { /* defaults */ }
 const savePF = () => { try { localStorage.setItem('tdr-proforma-v1', JSON.stringify(PF)); } catch { /* ignore */ } };
@@ -396,6 +465,7 @@ function renderSite() {
   $('rlvStats').innerHTML = [
     ['per buildable sf', money(r.perBsf).replace('$', '$')], ['per acre', money(r.perAcre)], ['per unit', money(r.perUnit)],
   ].map(([k, v]) => `<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+  renderMarket(f);
   $('massing').innerHTML = [
     fact('Gross floor area', `${num(r.gfaM2)} m²`, `${num(r.gfaSf)} sf`),
     (() => { const ma = marketArea(f); return fact('Sale price', `$${num(ma.price)}/sf`, `${ma.label} market area${ma.ward ? ` (${esc(ma.ward)})` : ''}. Edit area prices under Assumptions.`); })(),

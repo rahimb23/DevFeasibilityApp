@@ -240,6 +240,16 @@ function buildReport() {
 
   <section class="s">
     <h2><span class="no">07</span>Assumptions</h2>
+    ${(() => {
+      const ma = marketArea(f), code = ma.ward ? +ma.ward.match(/\d+/)[0] : null, w = code ? wardActivity(code) : null, city = cityActivity();
+      return `<h3>Sale price by market area</h3>
+      <p class="small">This site is in <b>${esc(ma.ward || 'an unidentified ward')}</b>, in the <b>${esc(ma.label)}</b> market area, so the pro forma uses <b>$${num(ma.price)}/sf</b>. ${esc(PRICE_NOTE)}</p>
+      <div class="tw"><table><thead><tr><th>Market area</th><th>Wards</th><th class="num">Open applications</th><th class="num">Sale price</th></tr></thead><tbody>
+        ${MARKET_AREAS.map((a) => `<tr class="${a.key === ma.key ? 'sel' : ''}"><td>${esc(a.label)}${a.key === ma.key ? ' <span class="chip acc">This site</span>' : ''}</td><td>${a.wards.join(', ')}</td><td class="num">${num(areaActivity(a).open)}</td><td class="num">$${num(PF[a.key])}/sf${PF[a.key] !== DEFAULTS[a.key] ? ' <span class="chip edit">edited</span>' : ''}</td></tr>`).join('')}
+      </tbody></table></div>
+      ${w ? `<p class="small muted" style="margin-top:8px">Development activity in ward ${code}: ${num(w.open)} open applications proposing about ${num(w.units)} units, a median proposed height of ${w.medStoreys ? num(w.medStoreys) : '—'} storeys (city: ${city.medStoreys ? num(city.medStoreys) : '—'}), and ${num(w.rezonings)} rezoning and Official Plan amendment files since ${w.since}. Units and heights are read from application descriptions and are approximate.</p>` : ''}
+      <h3 style="margin-top:16px">All assumptions</h3>`;
+    })()}
     <div class="assump">${FIELDS.map(([group, fields]) => `<div class="agroup"><h4>${esc(group)}</h4><dl>${fields.map(([k, label, unit]) => `<div><dt>${esc(label)}</dt><dd>${esc(fmtAssumption(PF[k], unit))}${edited(k) ? ' <span class="chip edit">edited</span>' : ''}</dd></div>`).join('')}</dl></div>`).join('')}</div>
     <p class="small muted" style="margin-top:10px">${FIELDS.some(([, fs]) => fs.some(([k]) => edited(k))) ? 'Values marked “edited” differ from the app’s defaults.' : 'These are the app’s default figures for Toronto high-rise condo in late 2026. Replace them with current market and cost figures.'}</p>
   </section>
