@@ -9,6 +9,16 @@ A map of City of Toronto development applications with a site feasibility tool.
   - Secondary Plan, Site and Area Specific Policies, Major Transit Station Area, heritage and ravine flags
   - density on nearby approved and proposed projects
   - a residual land value pro forma, with assumptions you can edit and a price/cost sensitivity grid
+  - a sale price set by **market area**. The City's 25 wards are grouped into four areas, and each site uses the price for the area its centre falls in:
+
+    | Market area | Wards | Starting price |
+    | --- | --- | --- |
+    | Downtown core | 10, 11, 13 | $1,300/sf |
+    | Central and midtown | 4, 8, 9, 12, 14, 15, 18, 19 | $1,150/sf |
+    | Inner suburbs | 2, 3, 5, 6, 16, 17, 20 | $1,000/sf |
+    | Outer suburbs | 1, 7, 21–25 | $875/sf |
+
+    The starting prices are estimates anchored to the 2026 citywide average for new condos (about $1,189/sf, reported by Toronto Life from Urbanation data). No free source breaks new-condo prices down by area, so replace them with your own comparables under *Assumptions*. Construction costs stay citywide.
 
 - **Opportunities:** every parcel gets a development opportunity score out of 100. It adds points for zoning (up to 25), transit station area (20), room to add density compared with nearby approvals (25), lot size (15), recent applications nearby (10) and a Secondary Plan (5), and takes points off for TRCA, ravine, natural heritage and heritage constraints.
   - Left out entirely: condos, designated heritage, floodplain land, parks, employment and institutional zones, and small lots.

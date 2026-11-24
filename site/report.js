@@ -93,7 +93,7 @@ function buildReport() {
   const lo = proforma(f, ch.fsi, { price: 0.95 }).rlv, hi = proforma(f, ch.fsi, { price: 1.05 }).rlv;
   const slope = (hi - lo) / 0.1, bePct = slope ? (-r.rlv / slope) * 100 : null;
   let s1;
-  if (r.rlv <= 0) s1 = `At ${esc(LABELS[ch.key].toLowerCase())} density (FSI ${num(ch.fsi, 1)}), this site cannot pay anything for the land at these assumptions: the residual is <b>${rptMoney(r.rlv)}</b>.${bePct != null && bePct > 0 && bePct < 60 ? ` Sale prices would need to rise about <b>${num(bePct, 1)}%</b>, to roughly $${num(PF.salePsf * (1 + bePct / 100))}/sf, to break even.` : ''}`;
+  if (r.rlv <= 0) s1 = `At ${esc(LABELS[ch.key].toLowerCase())} density (FSI ${num(ch.fsi, 1)}), this site cannot pay anything for the land at these assumptions: the residual is <b>${rptMoney(r.rlv)}</b>.${bePct != null && bePct > 0 && bePct < 60 ? ` Sale prices would need to rise about <b>${num(bePct, 1)}%</b>, to roughly $${num(salePrice(f) * (1 + bePct / 100))}/sf, to break even.` : ''}`;
   else if (r.rlv < 0.05 * r.revenue) s1 = `At ${esc(LABELS[ch.key].toLowerCase())} density (FSI ${num(ch.fsi, 1)}), this site supports a land value of about <b>${rptMoney(r.rlv)}</b>. That margin is thin. A 5% drop in sale prices takes it to <b>${rptMoney(lo)}</b>, and a 5% rise lifts it to <b>${rptMoney(hi)}</b>.`;
   else s1 = `At ${esc(LABELS[ch.key].toLowerCase())} density (FSI ${num(ch.fsi, 1)}), this site supports a land value of about <b>${rptMoney(r.rlv)}</b>, or ${rptMoney(r.perBsf)} per buildable sf. A 5% change in sale prices moves it between <b>${rptMoney(lo)}</b> and <b>${rptMoney(hi)}</b>.`;
   let s2;
@@ -221,6 +221,7 @@ function buildReport() {
       </tbody></table></div>
       <dl class="facts one">
         ${fact('Gross floor area', `${num(r.gfaM2)} m²`, `${num(r.gfaSf)} sf`)}
+        ${(() => { const ma = marketArea(f); return fact('Sale price', `$${num(ma.price)}/sf`, `${esc(ma.label)} market area${ma.ward ? ` (${esc(ma.ward)})` : ''}`); })()}
         ${fact('Units', num(r.units), `${num(PF.unitSize)} sf average, ${num(PF.efficiency)}% saleable`)}
         ${fact('Implied height', `≈ ${r.storeys} storeys`, `At a ${num(Math.min(PF.floorplate, f.area * 0.9))} m² floor plate${f.heightM && r.storeys * 3.2 > f.heightM ? ` · above the ${num(f.heightM)} m limit` : ''}`)}
         ${fact('Parking', `${num(r.stalls)} stalls`)}
@@ -233,7 +234,7 @@ function buildReport() {
     <h2><span class="no">06</span>Sensitivity: residual land value</h2>
     <p class="muted small">Rows change the sale price, columns change the hard cost. The outlined cell is the base case.</p>
     <div class="tw"><table class="sens"><thead><tr><th>Price ↓ · Cost →</th>${steps.map((s) => `<th>${s > 0 ? '+' : ''}${s * 100}%</th>`).join('')}</tr></thead><tbody>
-      ${grid.map((row, i) => `<tr><th>$${num(PF.salePsf * (1 + steps[i]))}/sf</th>${row.map((v, j) => `<td class="num${i === 2 && j === 2 ? ' base' : ''}" style="background:color-mix(in srgb, ${v < 0 ? 'var(--r-neg)' : 'var(--r-pos)'} ${Math.round((Math.min(1, Math.abs(v) / maxAbs) * 0.5 + 0.08) * 100)}%, transparent)">${rptMoney(v)}</td>`).join('')}</tr>`).join('')}
+      ${grid.map((row, i) => `<tr><th>$${num(salePrice(f) * (1 + steps[i]))}/sf</th>${row.map((v, j) => `<td class="num${i === 2 && j === 2 ? ' base' : ''}" style="background:color-mix(in srgb, ${v < 0 ? 'var(--r-neg)' : 'var(--r-pos)'} ${Math.round((Math.min(1, Math.abs(v) / maxAbs) * 0.5 + 0.08) * 100)}%, transparent)">${rptMoney(v)}</td>`).join('')}</tr>`).join('')}
     </tbody></table></div>
   </section>
 

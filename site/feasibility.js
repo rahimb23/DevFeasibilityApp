@@ -11,7 +11,8 @@ let siteLayer = null;
 
 // ---------- Pro forma assumptions ----------
 const DEFAULTS = {
-  efficiency: 82, unitSize: 700, salePsf: 1050, parkRatio: 0.3, stallPrice: 70000,
+  efficiency: 82, unitSize: 700, parkRatio: 0.3, stallPrice: 70000,
+  priceDowntown: 1300, priceCentral: 1150, priceInner: 1000, priceOuter: 875,
   hardPsf: 375, stallCost: 120000, contingency: 5, softPct: 22, dcPerUnit: 60000, demoPsf: 20,
   salesPct: 5, finRate: 7, finYears: 4, finDraw: 55, profitPct: 15, closingPct: 4, parklandPct: 10, cbcPct: 4,
   floorplate: 750,
@@ -21,7 +22,9 @@ const FIELDS = [
     ['efficiency', 'Saleable share of GFA', '%', 1], ['unitSize', 'Average unit size', 'sf', 25], ['floorplate', 'Typical floor plate', 'm²', 25],
   ]],
   ['Revenue', [
-    ['salePsf', 'Sale price', '$/sf', 25], ['parkRatio', 'Parking stalls per unit', '', 0.05], ['stallPrice', 'Parking stall price', '$', 5000],
+    ['priceDowntown', 'Sale price: Downtown core', '$/sf', 25], ['priceCentral', 'Sale price: Central and midtown', '$/sf', 25],
+    ['priceInner', 'Sale price: Inner suburbs', '$/sf', 25], ['priceOuter', 'Sale price: Outer suburbs', '$/sf', 25],
+    ['parkRatio', 'Parking stalls per unit', '', 0.05], ['stallPrice', 'Parking stall price', '$', 5000],
   ]],
   ['Construction and soft costs', [
     ['hardPsf', 'Hard cost (above grade)', '$/sf GFA', 5], ['stallCost', 'Underground parking cost', '$/stall', 5000],
@@ -36,6 +39,35 @@ const FIELDS = [
     ['finDraw', 'Average loan balance', '% of costs', 5], ['profitPct', 'Developer profit', '% of revenue', 0.5], ['closingPct', 'Land closing costs and transfer tax', '% of land value', 0.25],
   ]],
 ];
+// Market areas: the City's 25 wards grouped by typical new-condo pricing. Each site takes the sale
+// price of the area its centre falls in. The prices are editable estimates (see README).
+const MARKET_AREAS = [
+  { key: 'priceDowntown', label: 'Downtown core', wards: [10, 11, 13] },
+  { key: 'priceCentral', label: 'Central and midtown', wards: [4, 8, 9, 12, 14, 15, 18, 19] },
+  { key: 'priceInner', label: 'Inner suburbs', wards: [2, 3, 5, 6, 16, 17, 20] },
+  { key: 'priceOuter', label: 'Outer suburbs', wards: [1, 7, 21, 22, 23, 24, 25] },
+];
+function inWardRing(lon, lat, ring) {
+  let c = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if ((yi > lat) !== (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+const AREA_CACHE = new Map();
+function marketArea(f) {
+  const ck = `${f.lat.toFixed(5)},${f.lon.toFixed(5)}`;
+  let hit = AREA_CACHE.get(ck);
+  if (!hit) {
+    const w = (typeof WARDS !== 'undefined' && WARDS) ? WARDS.find((wd) => wd.rings.some((r) => inWardRing(f.lon, f.lat, r))) : null;
+    const code = w ? +w.code : null;
+    hit = { area: MARKET_AREAS.find((a) => a.wards.includes(code)) || MARKET_AREAS[1], ward: w ? `Ward ${code} ${w.name}` : null };
+    if (w) AREA_CACHE.set(ck, hit); // wards may still be loading; only cache a real match
+  }
+  return { ...hit.area, ward: hit.ward, price: PF[hit.area.key] };
+}
+const salePrice = (f) => marketArea(f).price;
 let PF = { ...DEFAULTS };
 try { Object.assign(PF, JSON.parse(localStorage.getItem('tdr-proforma-v1') || '{}')); } catch { /* defaults */ }
 const savePF = () => { try { localStorage.setItem('tdr-proforma-v1', JSON.stringify(PF)); } catch { /* ignore */ } };
@@ -246,7 +278,7 @@ function chosenFsi(f, pr) {
 }
 
 function proforma(f, fsi, adj = {}) {
-  const price = PF.salePsf * (adj.price || 1), hard = PF.hardPsf * (adj.hard || 1);
+  const price = salePrice(f) * (adj.price || 1), hard = PF.hardPsf * (adj.hard || 1);
   const gfaM2 = f.area * fsi, gfaSf = gfaM2 * SQFT, nsa = gfaSf * PF.efficiency / 100;
   const units = Math.max(0, Math.round(nsa / PF.unitSize));
   const stalls = Math.round(units * PF.parkRatio);
@@ -366,6 +398,7 @@ function renderSite() {
   ].map(([k, v]) => `<div><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
   $('massing').innerHTML = [
     fact('Gross floor area', `${num(r.gfaM2)} m²`, `${num(r.gfaSf)} sf`),
+    (() => { const ma = marketArea(f); return fact('Sale price', `$${num(ma.price)}/sf`, `${ma.label} market area${ma.ward ? ` (${esc(ma.ward)})` : ''}. Edit area prices under Assumptions.`); })(),
     fact('Units', num(r.units), `${num(r.nsa)} sf saleable at ${num(PF.unitSize)} sf average`),
     fact('Implied height', `≈ ${r.storeys} storeys`, `at a ${num(Math.min(PF.floorplate, f.area * 0.9))} m² floor plate` + (f.heightSt && r.storeys > f.heightSt ? ` · above the ${f.heightSt}-storey limit` : f.heightM && r.storeys * 3.2 > f.heightM ? ` · above the ${num(f.heightM)} m limit` : '')),
     fact('Parking', `${num(r.stalls)} stalls`),
@@ -386,7 +419,7 @@ function renderSite() {
   const maxAbs = Math.max(1, ...grid.flat().map(Math.abs));
   const short = (v) => { const a = Math.abs(v), sg = v < 0 ? '−' : ''; return a >= 1e6 ? `${sg}$${(a / 1e6).toFixed(a >= 1e7 ? 0 : 1)}M` : `${sg}$${Math.round(a / 1e3)}K`; };
   $('sens').innerHTML = `<thead><tr><th>$/sf · cost</th>${steps.map((s) => `<th>${s > 0 ? '+' : ''}${s * 100}%</th>`).join('')}</tr></thead><tbody>` +
-    grid.map((row, i) => `<tr><th>$${num(PF.salePsf * (1 + steps[i]))}</th>${row.map((v, j) => {
+    grid.map((row, i) => `<tr><th>$${num(salePrice(f) * (1 + steps[i]))}</th>${row.map((v, j) => {
       const a = Math.min(1, Math.abs(v) / maxAbs) * 0.55 + 0.08;
       return `<td class="${i === 2 && j === 2 ? 'base' : ''}" style="background:color-mix(in srgb, ${v < 0 ? 'var(--neg)' : 'var(--pos)'} ${Math.round(a * 100)}%, transparent)">${short(v)}</td>`;
     }).join('')}</tr>`).join('') + '</tbody>';
